@@ -104,25 +104,6 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
           <span className="material-symbols-outlined text-[18px]">arrow_back</span>
           <span>Back to Explore Stars</span>
         </button>
-
-        {/* Talent Quick Switcher Dropdown */}
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] font-mono uppercase text-[#d0c5af] hidden sm:inline">
-            Quick Switch:
-          </span>
-          <select
-            id="talent-quick-switch"
-            value={star.id}
-            onChange={(e) => onSelectStar(e.target.value)}
-            className="bg-[#1c1b1b] border border-[#4d4635]/40 text-[#f2ca50] text-xs font-mono rounded px-2.5 py-1 outline-none cursor-pointer"
-          >
-            {allStars.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name} ({s.category})
-              </option>
-            ))}
-          </select>
-        </div>
       </div>
 
       {/* Cinematic Header & Profile Section */}

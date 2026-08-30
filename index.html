@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (function() {
+        try {
+          const desc = Object.getOwnPropertyDescriptor(window, 'fetch') || Object.getOwnPropertyDescriptor(Window.prototype, 'fetch');
+          if (!desc || (!desc.set && desc.get)) {
+            const nativeFetch = window.fetch ? window.fetch.bind(window) : undefined;
+            let currentFetch = nativeFetch;
+            Object.defineProperty(window, 'fetch', {
+              get() {
+                return currentFetch || (nativeFetch ? nativeFetch : function() { return Promise.reject(new Error('Fetch not available')); });
+              },
+              set(fn) {
+                currentFetch = fn;
+              },
+              configurable: true,
+              enumerable: true,
+            });
+          }
+        } catch (e) {
+          console.warn('Window fetch descriptor patch handled:', e);
+        }
+      })();
+    </script>
+    <title>STARWIRE Intelligence</title>
+    <meta name="description" content="Exclusive entertainment intelligence platform featuring real-time analytics, talent dossiers, market sentiment, and insider industry briefs." />
+    <meta property="og:title" content="STARWIRE Intelligence" />
+    <meta property="og:description" content="Exclusive entertainment intelligence platform featuring real-time analytics, talent dossiers, market sentiment, and insider industry briefs." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  </head>
+  <body class="bg-[#131313] text-[#e5e2e1] antialiased selection:bg-[#f2ca50]/30 selection:text-[#f2ca50] min-h-screen">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

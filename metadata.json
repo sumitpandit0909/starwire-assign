@@ -1,0 +1,6 @@
+{
+  "name": "STARWIRE Intelligence",
+  "description": "Exclusive entertainment intelligence platform featuring real-time analytics, talent dossiers, market sentiment, and insider industry briefs.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

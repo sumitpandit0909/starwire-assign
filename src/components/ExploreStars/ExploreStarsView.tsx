@@ -3,7 +3,6 @@ import { Star, TMDBPerson } from '../../types';
 import {
   getTMDBImageUrl,
   fetchPopularPeople,
-  fetchTrendingPeople,
   searchTMDB,
 } from '../../services/tmdbService';
 
@@ -60,14 +59,13 @@ export const ExploreStarsView: React.FC<ExploreStarsViewProps> = ({
   followingIds,
   onToggleFollow,
 }) => {
-  const [activeTab, setActiveTab] = useState<'popular' | 'trending'>('popular');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [people, setPeople] = useState<TMDBPerson[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Load TMDB People (Popular, Trending, or Search Query)
+  // Load TMDB People (Popular or Search Query)
   useEffect(() => {
     let isCurrent = true;
 
@@ -82,18 +80,6 @@ export const ExploreStarsView: React.FC<ExploreStarsViewProps> = ({
             const results = (res.results as TMDBPerson[]) || [];
             setPeople(results);
             setTotalPages(Math.min(res.total_results ? Math.ceil(res.total_results / 20) : 1, 500));
-          }
-        } else if (activeTab === 'trending') {
-          const res = await fetchTrendingPeople(page);
-          if (isCurrent) {
-            if (res.results && res.results.length > 0) {
-              setPeople(res.results);
-              setTotalPages(Math.min(res.total_results ? Math.ceil(res.total_results / 20) : 1, 500));
-            } else if (page === 1) {
-              setPeople(mapStarsToTMDBPeople(stars));
-            } else {
-              setPeople([]);
-            }
           }
         } else {
           const res = await fetchPopularPeople(page);
@@ -132,14 +118,7 @@ export const ExploreStarsView: React.FC<ExploreStarsViewProps> = ({
         isCurrent = false;
       };
     }
-  }, [searchQuery, activeTab, page, stars]);
-
-  // Reset page to 1 when changing tabs or typing search
-  const handleTabChange = (tab: 'popular' | 'trending') => {
-    setActiveTab(tab);
-    setSearchQuery('');
-    setPage(1);
-  };
+  }, [searchQuery, page, stars]);
 
   const handleSearchChange = (q: string) => {
     setSearchQuery(q);
@@ -152,44 +131,17 @@ export const ExploreStarsView: React.FC<ExploreStarsViewProps> = ({
 
   return (
     <div id="explore-stars-container" className="flex flex-col gap-8 animate-fade-in pb-12">
-      {/* Page Header (Simple Words) */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1
-            id="explore-page-title"
-            className="font-headline-xl-mobile md:font-headline-xl text-3xl md:text-4xl text-[#FAF9F6] tracking-tight"
-          >
-            Explore Stars
-          </h1>
-          <p className="font-body-lg text-[15px] text-[#d0c5af] font-light mt-1">
-            Search and discover actors, actresses, and filmmakers worldwide.
-          </p>
-        </div>
-
-        {/* Tab Selection */}
-        <div className="flex items-center bg-[#1c1b1b] p-1 rounded-xl border border-[#4d4635]/30 self-start md:self-auto">
-          <button
-            onClick={() => handleTabChange('popular')}
-            className={`px-4 py-2 text-xs font-mono rounded-lg transition-all cursor-pointer ${
-              activeTab === 'popular' && !searchQuery
-                ? 'bg-[#f2ca50] text-[#131313] font-bold shadow-md'
-                : 'text-[#d0c5af] hover:text-[#FAF9F6]'
-            }`}
-          >
-            Popular Stars
-          </button>
-
-          <button
-            onClick={() => handleTabChange('trending')}
-            className={`px-4 py-2 text-xs font-mono rounded-lg transition-all cursor-pointer ${
-              activeTab === 'trending' && !searchQuery
-                ? 'bg-[#f2ca50] text-[#131313] font-bold shadow-md'
-                : 'text-[#d0c5af] hover:text-[#FAF9F6]'
-            }`}
-          >
-            Trending This Week
-          </button>
-        </div>
+      {/* Page Header */}
+      <div>
+        <h1
+          id="explore-page-title"
+          className="font-headline-xl-mobile md:font-headline-xl text-3xl md:text-4xl text-[#FAF9F6] tracking-tight"
+        >
+          Explore Stars
+        </h1>
+        <p className="font-body-lg text-[15px] text-[#d0c5af] font-light mt-1">
+          Search and discover actors, actresses, and filmmakers worldwide.
+        </p>
       </div>
 
       {/* Live Search Input */}
@@ -217,9 +169,7 @@ export const ExploreStarsView: React.FC<ExploreStarsViewProps> = ({
         <span>
           {searchQuery.trim().length >= 2
             ? `Search Results for "${searchQuery}"`
-            : activeTab === 'trending'
-            ? 'Trending Stars This Week'
-            : 'Popular Stars'}
+            : 'All Stars'}
         </span>
         <span>Page {page} of {totalPages}</span>
       </div>
@@ -325,7 +275,7 @@ export const ExploreStarsView: React.FC<ExploreStarsViewProps> = ({
         </div>
       )}
 
-      {/* Pagination Bar (Simple Words: Previous / Page X of Y / Next) */}
+      {/* Pagination Bar */}
       {!loading && people.length > 0 && (
         <div className="flex items-center justify-center gap-3 pt-6 border-t border-[#4d4635]/20">
           <button

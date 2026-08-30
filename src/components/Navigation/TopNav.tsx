@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { UserStats, Star, NewsBrief } from '../../types';
 
 interface TopNavProps {
@@ -22,11 +23,12 @@ export const TopNav: React.FC<TopNavProps> = ({
   user,
   onToggleMobileNav,
   watchlistIds,
-  onOpenWatchlist,
   isDarkMode,
   onToggleTheme,
   onLogout,
 }) => {
+  const navigate = useNavigate();
+
   return (
     <header
       id="top-header"
@@ -43,7 +45,10 @@ export const TopNav: React.FC<TopNavProps> = ({
           >
             <span className="material-symbols-outlined text-[24px]">menu</span>
           </button>
-          <span className="font-wordmark text-[14px] uppercase tracking-[0.35em] text-[#f2ca50]">
+          <span
+            onClick={() => navigate('/dashboard')}
+            className="font-wordmark text-[14px] uppercase tracking-[0.35em] text-[#f2ca50] cursor-pointer hover:text-[#ffe088] transition-colors"
+          >
             STARWIRE
           </span>
           <span className="hidden sm:inline-block font-mono text-[9px] text-[#10B981] tracking-widest uppercase px-2 py-0.5 rounded bg-[#10B981]/10 border border-[#10B981]/30 font-bold">
@@ -69,7 +74,7 @@ export const TopNav: React.FC<TopNavProps> = ({
           {/* Bookmarks / Watchlist Trigger */}
           <button
             id="top-bookmarks-btn"
-            onClick={onOpenWatchlist}
+            onClick={() => navigate('/watchlist')}
             className="text-[#d0c5af] hover:text-[#f2ca50] transition-colors p-2 rounded-full hover:bg-[#201f1f] relative cursor-pointer"
             aria-label="Watchlist"
           >

@@ -1,4 +1,13 @@
 import React, { useEffect } from 'react';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useParams,
+  useNavigate,
+  useLocation,
+} from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import { useStars } from './hooks/useStars';
 import { useNews } from './hooks/useNews';
@@ -22,30 +31,82 @@ import { IntelligenceModal } from './components/Modals/IntelligenceModal';
 import { NewsDetailModal } from './components/Modals/NewsDetailModal';
 import { SearchModal } from './components/Modals/SearchModal';
 
-export function App() {
-  // Hooks & Stores
-  const {
-    user,
-    isAuthenticated,
-    followingIds,
-    watchlistNewsIds,
-    initializeAuth,
-    logout,
-    toggleFollowStar,
-    toggleBookmarkNews,
-  } = useAuth();
+// Route Guard Component
+const ProtectedRoute: React.FC<{ isAuthenticated: boolean; children: React.ReactNode }> = ({
+  isAuthenticated,
+  children,
+}) => {
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" replace />;
+  }
+  return <>{children}</>;
+};
 
-  const { stars, selectedStar, selectStar } = useStars();
-  const { news, activeNewsModalId, activeModalNews, openNewsModal, closeNewsModal } = useNews();
+// Dynamic Star Details Route Wrapper
+const StarDetailsRouteWrapper: React.FC<{
+  stars: any[];
+  selectStar: (id: string) => void;
+  followingIds: string[];
+  toggleFollowStar: (id: string) => void;
+  openIntelligenceModal: (name?: string) => void;
+}> = ({ stars, selectStar, followingIds, toggleFollowStar, openIntelligenceModal }) => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
-  const currentTab = useDataStore((state) => state.currentTab);
-  const setCurrentTab = useDataStore((state) => state.setCurrentTab);
+  const star = stars.find((s) => s.id === id || s.tmdbId?.toString() === id) || stars[0];
+
+  if (!star) {
+    return <Navigate to="/explore" replace />;
+  }
+
+  return (
+    <StarDetailsView
+      star={star}
+      allStars={stars}
+      onSelectStar={(starId) => {
+        selectStar(starId);
+        navigate(`/star/${starId}`);
+      }}
+      onBackToExplore={() => navigate('/explore')}
+      isFollowing={followingIds.includes(star.id)}
+      onToggleFollow={(starId) => toggleFollowStar(starId)}
+      onOpenIntelligence={openIntelligenceModal}
+    />
+  );
+};
+
+// Main Terminal Layout Container
+const MainLayout: React.FC<{
+  user: any;
+  stars: any[];
+  news: any[];
+  followingIds: string[];
+  watchlistNewsIds: string[];
+  toggleFollowStar: (id: string) => void;
+  toggleBookmarkNews: (id: string) => void;
+  handleLogout: () => void;
+  selectStar: (id: string) => void;
+  openNewsModal: (id: string) => void;
+}> = ({
+  user,
+  stars,
+  news,
+  followingIds,
+  watchlistNewsIds,
+  toggleFollowStar,
+  toggleBookmarkNews,
+  handleLogout,
+  selectStar,
+  openNewsModal,
+}) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const regionalStats = useDataStore((state) => state.regionalStats);
   const platformBuzz = useDataStore((state) => state.platformBuzz);
   const isDarkMode = useDataStore((state) => state.isDarkMode);
   const toggleDarkMode = useDataStore((state) => state.toggleDarkMode);
   const toastMessage = useDataStore((state) => state.toastMessage);
-  const showToast = useDataStore((state) => state.showToast);
   const isIntelligenceOpen = useDataStore((state) => state.isIntelligenceOpen);
   const intelligenceTargetStar = useDataStore((state) => state.intelligenceTargetStar);
   const openIntelligenceModal = useDataStore((state) => state.openIntelligenceModal);
@@ -56,86 +117,14 @@ export function App() {
   const setMobileNavOpen = useDataStore((state) => state.setMobileNavOpen);
   const watchlistSubTab = useDataStore((state) => state.watchlistSubTab);
   const setWatchlistSubTab = useDataStore((state) => state.setWatchlistSubTab);
-  const loadLiveData = useDataStore((state) => state.loadLiveData);
 
-  // Initialize Auth & Data on load
-  useEffect(() => {
-    initializeAuth();
-    loadLiveData();
-  }, [initializeAuth, loadLiveData]);
+  const activeNewsModalId = useDataStore((state) => state.activeNewsModalId);
+  const closeNewsModal = useDataStore((state) => state.closeNewsModal);
+  const activeModalNews = news.find((n) => n.id === activeNewsModalId) || null;
 
-  // Authentication Access Control Guard
-  useEffect(() => {
-    // If not authenticated and trying to access inner terminal tabs, redirect to auth screen
-    if (!isAuthenticated && currentTab !== 'landing' && currentTab !== 'auth') {
-      setCurrentTab('auth');
-    }
-  }, [isAuthenticated, currentTab, setCurrentTab]);
-
-  const handleLogout = () => {
-    logout();
-    showToast('Signed out of session.');
-    setCurrentTab('landing');
-  };
-
-  // Selected following stars and watchlist briefs
   const followingStarsList = stars.filter((s) => followingIds.includes(s.id));
   const watchlistNewsList = news.filter((n) => watchlistNewsIds.includes(n.id));
 
-  // Dedicated Landing Page View
-  if (currentTab === 'landing') {
-    return (
-      <div className={isDarkMode ? 'dark' : 'light'}>
-        <LandingPageView
-          onEnterTerminal={() => {
-            if (isAuthenticated) {
-              setCurrentTab('dashboard');
-            } else {
-              setCurrentTab('auth');
-            }
-          }}
-          onSelectStar={(starId) => selectStar(starId)}
-          onOpenIntelligence={(starName) => openIntelligenceModal(starName)}
-          onRequestAccess={() => setCurrentTab('auth')}
-          stars={stars}
-          news={news}
-          isDarkMode={isDarkMode}
-          onToggleTheme={toggleDarkMode}
-          isAuthenticated={isAuthenticated}
-        />
-        
-        <IntelligenceModal
-          isOpen={isIntelligenceOpen}
-          onClose={closeIntelligenceModal}
-          stars={stars}
-          initialStarName={intelligenceTargetStar}
-        />
-      </div>
-    );
-  }
-
-  // Dedicated Auth View
-  if (currentTab === 'auth') {
-    return (
-      <div className={isDarkMode ? 'dark' : 'light'}>
-        <RequestAccessView
-          onSuccess={() => {
-            showToast('VIP Access Confirmed. Synced with MongoDB.');
-            setCurrentTab('dashboard');
-          }}
-          onCancelToDashboard={() => {
-            if (isAuthenticated) {
-              setCurrentTab('dashboard');
-            } else {
-              setCurrentTab('landing');
-            }
-          }}
-        />
-      </div>
-    );
-  }
-
-  // Inner Terminal App (Guarded by authentication)
   return (
     <div
       id="starwire-app-root"
@@ -145,7 +134,7 @@ export function App() {
       {toastMessage && (
         <div
           id="toast-notification-banner"
-          className="fixed bottom-6 right-6 z-50 bg-[#1c1b1b] border border-[#f2ca50] text-[#FAF9F6] px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 animate-fade-in text-xs font-mono"
+          className="fixed bottom-6 right-[#10B981] z-50 bg-[#1c1b1b] border border-[#f2ca50] text-[#FAF9F6] px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 animate-fade-in text-xs font-mono"
         >
           <span className="material-symbols-outlined text-[#f2ca50] text-[18px]">verified</span>
           <span>{toastMessage}</span>
@@ -154,16 +143,6 @@ export function App() {
 
       {/* Main Sidebar Navigation */}
       <SideNav
-        currentTab={currentTab}
-        onSelectTab={(tab) => {
-          if (tab === 'following') {
-            setWatchlistSubTab('following');
-          } else if (tab === 'watchlist') {
-            setWatchlistSubTab('watchlist');
-          } else {
-            setCurrentTab(tab);
-          }
-        }}
         user={user}
         onOpenIntelligence={() => openIntelligenceModal()}
         isDarkMode={isDarkMode}
@@ -181,100 +160,147 @@ export function App() {
           onToggleMobileNav={() => setMobileNavOpen(!isMobileNavOpen)}
           stars={stars}
           news={news}
-          onSelectStar={selectStar}
+          onSelectStar={(id) => {
+            selectStar(id);
+            navigate(`/star/${id}`);
+          }}
           onSelectNews={(id) => openNewsModal(id)}
           followingIds={followingIds}
           watchlistIds={watchlistNewsIds}
-          onOpenWatchlist={() => setWatchlistSubTab('watchlist')}
-          onOpenFollowing={() => setWatchlistSubTab('following')}
+          onOpenWatchlist={() => navigate('/watchlist')}
+          onOpenFollowing={() => navigate('/watchlist')}
           isDarkMode={isDarkMode}
           onToggleTheme={toggleDarkMode}
           onLogout={handleLogout}
         />
 
-        {/* Routed View Container */}
+        {/* Separate Page Routes */}
         <main className="flex-1 px-4 md:px-12 py-8 max-w-[1440px] mx-auto w-full">
-          {currentTab === 'dashboard' && (
-            <DashboardView
-              user={user}
-              stars={stars}
-              news={news}
-              regionalStats={regionalStats}
-              platformBuzz={platformBuzz}
-              onSelectStar={selectStar}
-              onSelectNews={(newsId) => openNewsModal(newsId)}
-              onExploreStars={() => setCurrentTab('explore')}
-              onViewTrending={() => setCurrentTab('trending')}
-              onViewAllMovies={() => setCurrentTab('movies')}
-              onViewAllNews={() => setCurrentTab('news')}
-              onOpenFollowing={() => setWatchlistSubTab('following')}
-              onOpenWatchlist={() => setWatchlistSubTab('watchlist')}
-              onOpenIntelligence={openIntelligenceModal}
-              onToggleFollow={toggleFollowStar}
-              followingIds={followingIds}
-              watchlistCount={watchlistNewsIds.length}
+          <Routes>
+            <Route
+              path="/dashboard"
+              element={
+                <DashboardView
+                  user={user}
+                  stars={stars}
+                  news={news}
+                  regionalStats={regionalStats}
+                  platformBuzz={platformBuzz}
+                  onSelectStar={(id) => {
+                    selectStar(id);
+                    navigate(`/star/${id}`);
+                  }}
+                  onSelectNews={(id) => openNewsModal(id)}
+                  onExploreStars={() => navigate('/explore')}
+                  onViewTrending={() => navigate('/trending')}
+                  onViewAllMovies={() => navigate('/movies')}
+                  onViewAllNews={() => navigate('/news')}
+                  onOpenFollowing={() => {
+                    setWatchlistSubTab('following');
+                    navigate('/watchlist');
+                  }}
+                  onOpenWatchlist={() => {
+                    setWatchlistSubTab('watchlist');
+                    navigate('/watchlist');
+                  }}
+                  onOpenIntelligence={openIntelligenceModal}
+                  onToggleFollow={toggleFollowStar}
+                  followingIds={followingIds}
+                  watchlistCount={watchlistNewsIds.length}
+                />
+              }
             />
-          )}
 
-          {currentTab === 'explore' && (
-            <ExploreStarsView
-              stars={stars}
-              onSelectStar={selectStar}
-              followingIds={followingIds}
-              onToggleFollow={toggleFollowStar}
+            <Route
+              path="/explore"
+              element={
+                <ExploreStarsView
+                  stars={stars}
+                  onSelectStar={(id) => {
+                    selectStar(id);
+                    navigate(`/star/${id}`);
+                  }}
+                  followingIds={followingIds}
+                  onToggleFollow={toggleFollowStar}
+                />
+              }
             />
-          )}
 
-          {currentTab === 'star-details' && selectedStar && (
-            <StarDetailsView
-              star={selectedStar}
-              allStars={stars}
-              onSelectStar={selectStar}
-              onBackToExplore={() => setCurrentTab('explore')}
-              isFollowing={followingIds.includes(selectedStar.id)}
-              onToggleFollow={(id) => toggleFollowStar(id)}
-              onOpenIntelligence={openIntelligenceModal}
+            <Route
+              path="/star/:id"
+              element={
+                <StarDetailsRouteWrapper
+                  stars={stars}
+                  selectStar={selectStar}
+                  followingIds={followingIds}
+                  toggleFollowStar={toggleFollowStar}
+                  openIntelligenceModal={openIntelligenceModal}
+                />
+              }
             />
-          )}
 
-          {currentTab === 'watchlist' && (
-            <WatchlistView
-              followingStars={followingStarsList}
-              watchlistNews={watchlistNewsList}
-              onSelectStar={selectStar}
-              onSelectNews={(newsId) => openNewsModal(newsId)}
-              onUnfollowStar={toggleFollowStar}
-              onRemoveBookmark={toggleBookmarkNews}
-              onExploreStars={() => setCurrentTab('explore')}
-              activeSubTab={watchlistSubTab}
-              setActiveSubTab={setWatchlistSubTab}
+            <Route
+              path="/watchlist"
+              element={
+                <WatchlistView
+                  followingStars={followingStarsList}
+                  watchlistNews={watchlistNewsList}
+                  onSelectStar={(id) => {
+                    selectStar(id);
+                    navigate(`/star/${id}`);
+                  }}
+                  onSelectNews={(id) => openNewsModal(id)}
+                  onUnfollowStar={toggleFollowStar}
+                  onRemoveBookmark={toggleBookmarkNews}
+                  onExploreStars={() => navigate('/explore')}
+                  activeSubTab={watchlistSubTab}
+                  setActiveSubTab={setWatchlistSubTab}
+                />
+              }
             />
-          )}
 
-          {currentTab === 'trending' && (
-            <TrendingView
-              stars={stars}
-              onSelectStar={selectStar}
-              onOpenIntelligence={openIntelligenceModal}
+            <Route
+              path="/trending"
+              element={
+                <TrendingView
+                  stars={stars}
+                  onSelectStar={(id) => {
+                    selectStar(id);
+                    navigate(`/star/${id}`);
+                  }}
+                  onOpenIntelligence={openIntelligenceModal}
+                />
+              }
             />
-          )}
 
-          {currentTab === 'movies' && (
-            <MoviesView
-              stars={stars}
-              onSelectStar={selectStar}
-              onOpenIntelligence={openIntelligenceModal}
+            <Route
+              path="/movies"
+              element={
+                <MoviesView
+                  stars={stars}
+                  onSelectStar={(id) => {
+                    selectStar(id);
+                    navigate(`/star/${id}`);
+                  }}
+                  onOpenIntelligence={openIntelligenceModal}
+                />
+              }
             />
-          )}
 
-          {currentTab === 'news' && (
-            <NewsListView
-              news={news}
-              onSelectNews={(id) => openNewsModal(id)}
-              watchlistIds={watchlistNewsIds}
-              onToggleBookmark={toggleBookmarkNews}
+            <Route
+              path="/news"
+              element={
+                <NewsListView
+                  news={news}
+                  onSelectNews={(id) => openNewsModal(id)}
+                  watchlistIds={watchlistNewsIds}
+                  onToggleBookmark={toggleBookmarkNews}
+                />
+              }
             />
-          )}
+
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
         </main>
       </div>
 
@@ -298,11 +324,144 @@ export function App() {
         onClose={() => setSearchModalOpen(false)}
         stars={stars}
         news={news}
-        onSelectStar={selectStar}
+        onSelectStar={(id) => {
+          selectStar(id);
+          navigate(`/star/${id}`);
+        }}
         onSelectNews={(id) => openNewsModal(id)}
         onOpenIntelligence={openIntelligenceModal}
       />
     </div>
+  );
+};
+
+export function AppContent() {
+  const {
+    user,
+    isAuthenticated,
+    followingIds,
+    watchlistNewsIds,
+    initializeAuth,
+    logout,
+    toggleFollowStar,
+    toggleBookmarkNews,
+  } = useAuth();
+
+  const { stars, selectStar } = useStars();
+  const { news, openNewsModal } = useNews();
+
+  const isDarkMode = useDataStore((state) => state.isDarkMode);
+  const toggleDarkMode = useDataStore((state) => state.toggleDarkMode);
+  const showToast = useDataStore((state) => state.showToast);
+  const isIntelligenceOpen = useDataStore((state) => state.isIntelligenceOpen);
+  const intelligenceTargetStar = useDataStore((state) => state.intelligenceTargetStar);
+  const openIntelligenceModal = useDataStore((state) => state.openIntelligenceModal);
+  const closeIntelligenceModal = useDataStore((state) => state.closeIntelligenceModal);
+  const loadLiveData = useDataStore((state) => state.loadLiveData);
+
+  const navigate = useNavigate();
+
+  // Initialize Auth & Data on load
+  useEffect(() => {
+    initializeAuth();
+    loadLiveData();
+  }, [initializeAuth, loadLiveData]);
+
+  const handleLogout = () => {
+    logout();
+    showToast('Signed out of session.');
+    navigate('/');
+  };
+
+  return (
+    <Routes>
+      {/* Landing Page Route */}
+      <Route
+        path="/"
+        element={
+          <div className={isDarkMode ? 'dark' : 'light'}>
+            <LandingPageView
+              onEnterTerminal={() => {
+                if (isAuthenticated) {
+                  navigate('/dashboard');
+                } else {
+                  navigate('/auth');
+                }
+              }}
+              onSelectStar={(starId) => {
+                selectStar(starId);
+                navigate(`/star/${starId}`);
+              }}
+              onOpenIntelligence={(starName) => openIntelligenceModal(starName)}
+              onRequestAccess={() => navigate('/auth')}
+              stars={stars}
+              news={news}
+              isDarkMode={isDarkMode}
+              onToggleTheme={toggleDarkMode}
+              isAuthenticated={isAuthenticated}
+            />
+
+            <IntelligenceModal
+              isOpen={isIntelligenceOpen}
+              onClose={closeIntelligenceModal}
+              stars={stars}
+              initialStarName={intelligenceTargetStar}
+            />
+          </div>
+        }
+      />
+
+      {/* Auth / Request Access Route */}
+      <Route
+        path="/auth"
+        element={
+          <div className={isDarkMode ? 'dark' : 'light'}>
+            <RequestAccessView
+              onSuccess={() => {
+                showToast('VIP Access Confirmed. Synced with MongoDB.');
+                navigate('/dashboard');
+              }}
+              onCancelToDashboard={() => {
+                if (isAuthenticated) {
+                  navigate('/dashboard');
+                } else {
+                  navigate('/');
+                }
+              }}
+            />
+          </div>
+        }
+      />
+
+      {/* Inner Terminal Protected Routes */}
+      <Route
+        path="/*"
+        element={
+          <ProtectedRoute isAuthenticated={isAuthenticated}>
+            <MainLayout
+              user={user}
+              stars={stars}
+              news={news}
+              followingIds={followingIds}
+              watchlistNewsIds={watchlistNewsIds}
+              toggleFollowStar={toggleFollowStar}
+              toggleBookmarkNews={toggleBookmarkNews}
+              handleLogout={handleLogout}
+              selectStar={selectStar}
+              openNewsModal={openNewsModal}
+            />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+  );
+}
+
+export function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
   );
 }
 

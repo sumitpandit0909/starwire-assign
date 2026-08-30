@@ -10,11 +10,15 @@ const TMDB_API_KEY = process.env.TMDB_API_KEY || '64f4bc14051292f619dae37b8f28c7
 const TMDB_READ_ACCESS_TOKEN = process.env.TMDB_READ_ACCESS_TOKEN || '';
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
-// TMDB Fetch Helper
-async function fetchTMDB(endpoint: string, params: Record<string, string> = {}) {
+// TMDB Fetch Helper - Official TMDB API Integration with Retry Resilience
+async function fetchTMDB(endpoint: string, params: Record<string, string> = {}, retries = 3): Promise<any> {
   const url = new URL(`${TMDB_BASE_URL}${endpoint}`);
   
-  if (TMDB_API_KEY && !TMDB_READ_ACCESS_TOKEN) {
+  if (!params.language) {
+    url.searchParams.set('language', 'en-US');
+  }
+
+  if (TMDB_API_KEY) {
     url.searchParams.set('api_key', TMDB_API_KEY);
   }
   
@@ -25,22 +29,32 @@ async function fetchTMDB(endpoint: string, params: Record<string, string> = {}) 
   }
 
   const headers: Record<string, string> = {
-    'Accept': 'application/json',
+    'accept': 'application/json',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   };
 
   if (TMDB_READ_ACCESS_TOKEN) {
     headers['Authorization'] = `Bearer ${TMDB_READ_ACCESS_TOKEN}`;
   }
 
-  const response = await fetch(url.toString(), { method: 'GET', headers });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error(`TMDB API Error [${response.status}] for ${endpoint}:`, errorText);
-    throw new Error(`TMDB error ${response.status}: ${errorText}`);
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const response = await fetch(url.toString(), { method: 'GET', headers });
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`TMDB API Error [${response.status}] for ${endpoint}:`, errorText);
+        throw new Error(`TMDB error ${response.status}: ${errorText}`);
+      }
+      return await response.json();
+    } catch (err: any) {
+      if (attempt < retries) {
+        await new Promise((resolve) => setTimeout(resolve, attempt * 250));
+      } else {
+        console.error(`TMDB fetch error after ${retries} attempts for ${endpoint}:`, err.message);
+        throw err;
+      }
+    }
   }
-
-  return response.json();
 }
 
 // Categorize NewsAPI Articles

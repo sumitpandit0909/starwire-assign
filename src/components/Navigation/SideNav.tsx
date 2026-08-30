@@ -1,9 +1,8 @@
 import React from 'react';
-import { TabView, UserStats } from '../../types';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { UserStats } from '../../types';
 
 interface SideNavProps {
-  currentTab: TabView;
-  onSelectTab: (tab: TabView) => void;
   user: UserStats;
   onOpenIntelligence: () => void;
   isDarkMode: boolean;
@@ -14,8 +13,6 @@ interface SideNavProps {
 }
 
 export const SideNav: React.FC<SideNavProps> = ({
-  currentTab,
-  onSelectTab,
   user,
   onOpenIntelligence,
   isDarkMode,
@@ -24,19 +21,20 @@ export const SideNav: React.FC<SideNavProps> = ({
   onCloseMobile,
   onLogout,
 }) => {
-  // Inner terminal navigation items only (No landing page button)
-  const navItems: { id: TabView; label: string; icon: string }[] = [
-    { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
-    { id: 'explore', label: 'Explore Stars', icon: 'star' },
-    { id: 'trending', label: 'Trending', icon: 'trending_up' },
-    { id: 'movies', label: 'Movies & TMDB', icon: 'movie' },
-    { id: 'following', label: 'Following', icon: 'person_add' },
-    { id: 'watchlist', label: 'Watchlist', icon: 'bookmark' },
-    { id: 'news', label: 'News Wire', icon: 'newspaper' },
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const navItems = [
+    { path: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
+    { path: '/explore', label: 'Explore Stars', icon: 'star' },
+    { path: '/trending', label: 'Trending', icon: 'trending_up' },
+    { path: '/movies', label: 'Movies & TMDB', icon: 'movie' },
+    { path: '/watchlist', label: 'Watchlist & Following', icon: 'bookmark' },
+    { path: '/news', label: 'News Wire', icon: 'newspaper' },
   ];
 
-  const handleNavClick = (tab: TabView) => {
-    onSelectTab(tab);
+  const handleNavClick = (path: string) => {
+    navigate(path);
     if (onCloseMobile) onCloseMobile();
   };
 
@@ -60,7 +58,7 @@ export const SideNav: React.FC<SideNavProps> = ({
         {/* User Brand Anchor */}
         <div
           id="sidebar-user-anchor"
-          onClick={() => handleNavClick('dashboard')}
+          onClick={() => handleNavClick('/dashboard')}
           className="mb-10 flex items-center gap-4 cursor-pointer group"
         >
           <div className="w-11 h-11 rounded-full overflow-hidden border border-[#99907c]/50 relative ring-1 ring-[#f2ca50]/30 group-hover:ring-[#f2ca50] transition-all">
@@ -84,12 +82,12 @@ export const SideNav: React.FC<SideNavProps> = ({
         {/* Navigation Items */}
         <div className="flex-1 flex flex-col gap-1.5 overflow-y-auto hide-scrollbar">
           {navItems.map((item) => {
-            const isActive = currentTab === item.id || (item.id === 'explore' && currentTab === 'star-details');
+            const isActive = location.pathname === item.path || (item.path === '/explore' && location.pathname.startsWith('/star/'));
             return (
               <button
-                key={item.id}
-                id={`nav-link-${item.id}`}
-                onClick={() => handleNavClick(item.id)}
+                key={item.path}
+                id={`nav-link-${item.path.replace('/', '')}`}
+                onClick={() => handleNavClick(item.path)}
                 className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-lg font-data-label text-[13px] uppercase tracking-wider transition-all duration-200 text-left cursor-pointer ${
                   isActive
                     ? 'text-[#f2ca50] font-bold border-r-2 border-[#f2ca50] bg-[#1c1b1b]'

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Star, TMDBPerson, TMDBMovie } from '../../types';
+import { Star, TMDBPerson } from '../../types';
 import {
   getTMDBImageUrl,
   fetchPersonDetails,
@@ -30,20 +30,29 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
   const [tmdbPerson, setTmdbPerson] = useState<TMDBPerson | null>(null);
   const [loadingTmdb, setLoadingTmdb] = useState<boolean>(false);
 
-  // Fetch real-time TMDB details
+  // Fetch real-time TMDB details via /api/tmdb/person/:id
   useEffect(() => {
     let isMounted = true;
     async function loadTMDBInfo() {
       setLoadingTmdb(true);
       try {
-        if (star.tmdbId) {
-          const p = await fetchPersonDetails(star.tmdbId);
-          if (isMounted && p) setTmdbPerson(p);
-        } else {
-          // Search TMDB for this person
-          const res = await searchTMDB(star.name, 'person', 1);
-          if (isMounted && res.results && res.results.length > 0) {
-            setTmdbPerson(res.results[0] as TMDBPerson);
+        const targetId = star.tmdbId || star.id;
+        if (targetId && !isNaN(Number(targetId))) {
+          const p = await fetchPersonDetails(targetId);
+          if (isMounted && p && p.id) {
+            setTmdbPerson(p);
+            return;
+          }
+        }
+        // Search TMDB by name if TMDB ID is not numeric
+        const res = await searchTMDB(star.name, 'person', 1);
+        if (isMounted && res.results && res.results.length > 0) {
+          const firstResult = res.results[0] as TMDBPerson;
+          if (firstResult.id) {
+            const detailed = await fetchPersonDetails(firstResult.id);
+            setTmdbPerson(detailed || firstResult);
+          } else {
+            setTmdbPerson(firstResult);
           }
         }
       } catch (e) {
@@ -79,17 +88,21 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
     })
     .join(' ');
 
+  const displayName = tmdbPerson?.name || star.name;
+  const bioText = tmdbPerson?.biography || star.dossierBio;
+  const castCredits = tmdbPerson?.movie_credits?.cast || [];
+
   return (
-    <div id="star-details-container" className="flex flex-col min-h-screen -mt-8 -mx-4 md:-mx-12 animate-fade-in">
+    <div id="star-details-container" className="flex flex-col min-h-screen -mt-8 -mx-4 md:-mx-12 animate-fade-in pb-12">
       {/* Back Navigation Bar */}
       <div className="px-4 md:px-12 py-3 bg-[#131313]/90 backdrop-blur border-b border-[#4d4635]/20 flex items-center justify-between sticky top-16 z-20">
         <button
           id="back-to-explore-btn"
           onClick={onBackToExplore}
-          className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-[#d0c5af] hover:text-[#f2ca50] transition-colors"
+          className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-[#d0c5af] hover:text-[#f2ca50] transition-colors cursor-pointer"
         >
           <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-          <span>Back to Talent Index</span>
+          <span>Back to Explore Stars</span>
         </button>
 
         {/* Talent Quick Switcher Dropdown */}
@@ -101,7 +114,7 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
             id="talent-quick-switch"
             value={star.id}
             onChange={(e) => onSelectStar(e.target.value)}
-            className="bg-[#1c1b1b] border border-[#4d4635]/40 text-[#f2ca50] text-xs font-mono rounded px-2.5 py-1 outline-none"
+            className="bg-[#1c1b1b] border border-[#4d4635]/40 text-[#f2ca50] text-xs font-mono rounded px-2.5 py-1 outline-none cursor-pointer"
           >
             {allStars.map((s) => (
               <option key={s.id} value={s.id}>
@@ -112,10 +125,10 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
         </div>
       </div>
 
-      {/* Cinematic Header & Profile Section (Exact match to Screen 3) */}
+      {/* Cinematic Header & Profile Section */}
       <section
         id="star-cinematic-header"
-        className="relative w-full h-[520px] md:h-[620px] overflow-hidden flex flex-col justify-end"
+        className="relative w-full h-[480px] md:h-[580px] overflow-hidden flex flex-col justify-end"
       >
         {/* Cover Image */}
         <div
@@ -123,7 +136,8 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
           style={{
             backgroundImage: `url('${
               star.coverImage ||
-              'https://lh3.googleusercontent.com/aida-public/AB6AXuCTxUiadxSt57ISSj4AI67pVxDbhuSqW2qezmza97XA-k6NIZ9m5cET4qrktWbHGdoRjWXCwMIhMR9EW591P6uGtMFB3fSCrUVjZSyqUsd-cwiE-RlaoHTqD3d66DOxeFyZ3qurVgpwsTt3dy-T-Q09d0bxsG38iq5AZ_KxQpbq2NXMU5XvHlLvh4cOqPZJjTVjXIURzanq4uDBmg1fmD3sLTfIucNP-sIC8ZhA_-XRUUXbLLV7vObMgw'
+              getTMDBImageUrl(tmdbPerson?.profile_path, 'original') ||
+              'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1280&q=80'
             }')`,
           }}
         />
@@ -135,8 +149,8 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
           {/* Avatar Container with Golden Accent Ring */}
           <div className="w-36 h-36 md:w-48 md:h-48 rounded-2xl overflow-hidden border-2 border-[#f2ca50] shadow-2xl relative shrink-0 bg-[#2a2a2a]">
             <img
-              src={star.dossierImage || star.avatarImage}
-              alt={star.name}
+              src={getTMDBImageUrl(tmdbPerson?.profile_path) || star.dossierImage || star.avatarImage}
+              alt={displayName}
               className="w-full h-full object-cover"
               referrerPolicy="no-referrer"
             />
@@ -150,21 +164,20 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
                 <span className="bg-[#f2ca50]/15 text-[#f2ca50] font-data-label text-[11px] px-3 py-1 rounded uppercase tracking-wider border border-[#f2ca50]/30 font-semibold backdrop-blur-md">
                   {star.roles.join(' · ')} · {star.category}
                 </span>
-                {star.verified && (
-                  <span className="flex items-center text-[#f2ca50] text-xs font-mono font-medium">
-                    <span
-                      className="material-symbols-outlined text-[16px] mr-1"
-                      style={{ fontVariationSettings: "'FILL' 1" }}
-                    >
-                      verified
-                    </span>
-                    Verified Profile
+                {tmdbPerson?.popularity && (
+                  <span className="flex items-center text-[#10B981] text-xs font-mono font-medium bg-[#10B981]/10 px-2.5 py-0.5 rounded border border-[#10B981]/30">
+                    ★ TMDB Pop: {tmdbPerson.popularity.toFixed(1)}
                   </span>
                 )}
               </div>
-              <h1 className="font-headline-xl-mobile md:font-headline-xl text-headline-xl-mobile md:text-headline-xl text-[#FAF9F6] tracking-tight">
-                {star.name}
+              <h1 className="font-headline-xl-mobile md:font-headline-xl text-3xl md:text-5xl text-[#FAF9F6] tracking-tight">
+                {displayName}
               </h1>
+              {tmdbPerson?.place_of_birth && (
+                <p className="text-xs text-[#d0c5af] font-mono">
+                  Born in {tmdbPerson.place_of_birth} {tmdbPerson.birthday ? `(${tmdbPerson.birthday})` : ''}
+                </p>
+              )}
             </div>
 
             {/* CTA Actions */}
@@ -172,7 +185,7 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
               <button
                 id="details-follow-btn"
                 onClick={() => onToggleFollow(star.id)}
-                className={`px-8 py-3.5 rounded-lg transition-all duration-300 font-data-value text-[13px] uppercase tracking-wider flex items-center justify-center gap-2 ${
+                className={`px-8 py-3.5 rounded-xl transition-all duration-300 font-data-value text-[13px] uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer ${
                   isFollowing
                     ? 'bg-[#1c1b1b] text-[#f2ca50] border border-[#f2ca50]'
                     : 'bg-[#f2ca50] text-[#131313] font-bold bloom-hover'
@@ -181,45 +194,44 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
                 <span className="material-symbols-outlined text-[18px]">
                   {isFollowing ? 'check' : 'person_add'}
                 </span>
-                <span>{isFollowing ? 'Following' : '+ Follow'}</span>
+                <span>{isFollowing ? 'Following' : 'Follow Star'}</span>
               </button>
 
               <button
                 id="details-query-intel-btn"
-                onClick={() => onOpenIntelligence(star.name)}
-                className="px-4 py-3.5 rounded-lg bg-[#2a2a2a] text-[#FAF9F6] hover:text-[#f2ca50] border border-[#4d4635]/40 transition-colors font-data-label text-xs uppercase"
-                title="Deep AI Intel Analysis"
+                onClick={() => onOpenIntelligence(displayName)}
+                className="px-4 py-3.5 rounded-xl bg-[#2a2a2a] text-[#FAF9F6] hover:text-[#f2ca50] border border-[#4d4635]/40 transition-colors font-data-label text-xs uppercase cursor-pointer"
+                title="AI Career Analysis"
               >
-                <span className="material-symbols-outlined text-[18px]">psychology</span>
+                <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
               </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Main Grid: 8 Cols Main Intelligence + 4 Cols Trajectory & Signals */}
+      {/* Main Grid */}
       <div className="max-w-[1440px] mx-auto px-4 md:px-12 py-12 grid grid-cols-1 lg:grid-cols-12 gap-8 w-full">
         {/* Main Content Column (8 Cols) */}
         <div className="lg:col-span-8 space-y-10">
           {/* Intelligence Metrics Bento Grid */}
           <section id="star-intelligence-metrics-section">
-            <h2 className="font-headline-md text-headline-md text-[#FAF9F6] mb-6 flex items-center gap-3">
+            <h2 className="font-headline-md text-xl md:text-2xl text-[#FAF9F6] mb-6 flex items-center gap-3">
               <span className="material-symbols-outlined text-[#f2ca50] text-[28px]">
                 monitoring
               </span>
-              Intelligence Metrics
+              Star Intelligence Metrics
             </h2>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {/* Metric 1: Star Score */}
-              <div className="bg-[#1c1b1b] rounded-xl p-5 gold-border-subtle flex flex-col justify-between h-36 relative overflow-hidden group hover:bg-[#201f1f] transition-all">
-                <div className="absolute top-0 right-0 w-16 h-16 bg-[#f2ca50]/5 rounded-bl-full blur-xl group-hover:bg-[#f2ca50]/15 transition-colors" />
+              <div className="bg-[#1c1b1b] rounded-2xl p-5 gold-border-subtle flex flex-col justify-between h-36 relative overflow-hidden group hover:bg-[#201f1f] transition-all">
                 <span className="font-data-label text-[11px] text-[#d0c5af] uppercase tracking-wider">
-                  Star Score
+                  StarScore™
                 </span>
                 <div className="flex items-end gap-2">
-                  <span className="font-headline-lg text-[38px] text-[#f2ca50] font-bold leading-none">
-                    {star.starScoreTotal || 286}
+                  <span className="font-headline-lg text-3xl md:text-4xl text-[#f2ca50] font-bold leading-none">
+                    {star.starScore}
                   </span>
                   <span className="text-[#10B981] text-xs font-mono flex items-center pb-1 font-semibold">
                     <span className="material-symbols-outlined text-[14px]">trending_up</span>
@@ -228,53 +240,49 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
                 </div>
               </div>
 
-              {/* Metric 2: Buzz Meter */}
-              <div className="bg-[#1c1b1b] rounded-xl p-5 gold-border-subtle flex flex-col justify-between h-36 relative overflow-hidden group hover:bg-[#201f1f] transition-all">
+              {/* Metric 2: TMDB Popularity */}
+              <div className="bg-[#1c1b1b] rounded-2xl p-5 gold-border-subtle flex flex-col justify-between h-36 relative overflow-hidden group hover:bg-[#201f1f] transition-all">
                 <span className="font-data-label text-[11px] text-[#d0c5af] uppercase tracking-wider">
-                  Buzz Meter
+                  TMDB Popularity
                 </span>
                 <div>
                   <div className="flex items-end gap-1.5 mb-2">
-                    <span className="font-headline-lg text-[38px] text-[#FAF9F6] font-bold leading-none">
-                      {star.buzzMeter || 84}
+                    <span className="font-headline-lg text-3xl md:text-4xl text-[#FAF9F6] font-bold leading-none">
+                      {tmdbPerson?.popularity ? tmdbPerson.popularity.toFixed(0) : star.buzzMeter || 84}
                     </span>
-                    <span className="text-[#d0c5af] text-xs font-mono pb-1">/100</span>
+                    <span className="text-[#d0c5af] text-xs font-mono pb-1">Index</span>
                   </div>
-                  {/* Mini Progress */}
                   <div className="w-full bg-[#353534] h-1.5 rounded-full overflow-hidden">
                     <div
                       className="bg-[#f2ca50] h-full rounded-full transition-all duration-1000"
-                      style={{ width: `${star.buzzMeter || 84}%` }}
+                      style={{ width: `${Math.min(100, (tmdbPerson?.popularity || 80) * 1.2)}%` }}
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Metric 3: Global Reach */}
-              <div className="bg-[#1c1b1b] rounded-xl p-5 gold-border-subtle flex flex-col justify-between h-36 relative overflow-hidden group hover:bg-[#201f1f] transition-all">
+              {/* Metric 3: Audience Reach */}
+              <div className="bg-[#1c1b1b] rounded-2xl p-5 gold-border-subtle flex flex-col justify-between h-36 relative overflow-hidden group hover:bg-[#201f1f] transition-all">
                 <span className="font-data-label text-[11px] text-[#d0c5af] uppercase tracking-wider">
-                  Global Reach
+                  Audience Reach
                 </span>
                 <div className="flex items-end gap-2">
-                  <span className="font-headline-lg text-[38px] text-[#FAF9F6] font-bold leading-none">
+                  <span className="font-headline-lg text-3xl md:text-4xl text-[#FAF9F6] font-bold leading-none">
                     {star.globalReachCount || star.reach}
                   </span>
                 </div>
               </div>
 
-              {/* Metric 4: Engagement */}
-              <div className="bg-[#1c1b1b] rounded-xl p-5 gold-border-subtle flex flex-col justify-between h-36 relative overflow-hidden group hover:bg-[#201f1f] transition-all">
+              {/* Metric 4: Filmography Count */}
+              <div className="bg-[#1c1b1b] rounded-2xl p-5 gold-border-subtle flex flex-col justify-between h-36 relative overflow-hidden group hover:bg-[#201f1f] transition-all">
                 <span className="font-data-label text-[11px] text-[#d0c5af] uppercase tracking-wider">
-                  Engagement
+                  Movies &amp; Works
                 </span>
                 <div className="flex items-end gap-2">
-                  <span className="font-headline-lg text-[38px] text-[#FAF9F6] font-bold leading-none">
-                    {star.engagementRate || '12.8%'}
+                  <span className="font-headline-lg text-3xl md:text-4xl text-[#FAF9F6] font-bold leading-none">
+                    {castCredits.length || star.films?.length || 12}
                   </span>
-                  <span className="text-[#10B981] text-xs font-mono flex items-center pb-1 font-semibold">
-                    <span className="material-symbols-outlined text-[14px]">trending_up</span>
-                    +{star.engagementDelta || 1.2}%
-                  </span>
+                  <span className="text-[#d0c5af] text-xs font-mono pb-1">Films</span>
                 </div>
               </div>
             </div>
@@ -286,67 +294,127 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
               <div className="flex gap-4 md:gap-6 overflow-x-auto">
                 <button
                   onClick={() => setActiveTab('dossier')}
-                  className={`font-data-label text-[12px] uppercase tracking-widest pb-2 transition-all whitespace-nowrap ${
+                  className={`font-data-label text-[12px] uppercase tracking-widest pb-2 transition-all whitespace-nowrap cursor-pointer ${
                     activeTab === 'dossier'
                       ? 'text-[#f2ca50] border-b-2 border-[#f2ca50] font-bold'
                       : 'text-[#d0c5af] hover:text-[#f2ca50]'
                   }`}
                 >
-                  Dossier / Background
-                </button>
-                <button
-                  onClick={() => setActiveTab('filmography')}
-                  className={`font-data-label text-[12px] uppercase tracking-widest pb-2 transition-all whitespace-nowrap ${
-                    activeTab === 'filmography'
-                      ? 'text-[#f2ca50] border-b-2 border-[#f2ca50] font-bold'
-                      : 'text-[#d0c5af] hover:text-[#f2ca50]'
-                  }`}
-                >
-                  Key Box Office Milestones ({star.films?.length || 4})
+                  Biography &amp; Overview
                 </button>
                 <button
                   onClick={() => setActiveTab('tmdb_credits')}
-                  className={`font-data-label text-[12px] uppercase tracking-widest pb-2 transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                  className={`font-data-label text-[12px] uppercase tracking-widest pb-2 transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
                     activeTab === 'tmdb_credits'
                       ? 'text-[#f2ca50] border-b-2 border-[#f2ca50] font-bold'
                       : 'text-[#d0c5af] hover:text-[#f2ca50]'
                   }`}
                 >
                   <span className="h-1.5 w-1.5 rounded-full bg-[#10B981]" />
-                  <span>TMDB Live Filmography</span>
+                  <span>TMDB Movie Credits ({castCredits.length})</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('filmography')}
+                  className={`font-data-label text-[12px] uppercase tracking-widest pb-2 transition-all whitespace-nowrap cursor-pointer ${
+                    activeTab === 'filmography'
+                      ? 'text-[#f2ca50] border-b-2 border-[#f2ca50] font-bold'
+                      : 'text-[#d0c5af] hover:text-[#f2ca50]'
+                  }`}
+                >
+                  Box Office Milestones
                 </button>
               </div>
 
-              <span className="text-[11px] font-mono text-[#d0c5af] hidden sm:inline">
-                Debut: {star.debutYear || 1992}
-              </span>
+              {tmdbPerson?.birthday && (
+                <span className="text-[11px] font-mono text-[#d0c5af] hidden sm:inline">
+                  Born: {tmdbPerson.birthday}
+                </span>
+              )}
             </div>
 
             {activeTab === 'dossier' && (
               <div className="space-y-6">
-                <p className="font-body-lg text-[16px] md:text-[18px] text-[#d0c5af] leading-relaxed font-light">
-                  {star.dossierBio}
-                </p>
+                <div className="font-body-lg text-[15px] md:text-[17px] text-[#d0c5af] leading-relaxed font-light whitespace-pre-line">
+                  {bioText}
+                </div>
 
                 {/* Key Attributes Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-[#4d4635]/20 text-xs font-mono">
                   <div>
-                    <span className="text-[#99907c] uppercase text-[10px] block">Primary Industry</span>
-                    <span className="text-[#FAF9F6] font-semibold">{star.industry} Cinema</span>
+                    <span className="text-[#99907c] uppercase text-[10px] block">Birth Date</span>
+                    <span className="text-[#FAF9F6] font-semibold">{tmdbPerson?.birthday || star.birthDate || 'N/A'}</span>
                   </div>
                   <div>
-                    <span className="text-[#99907c] uppercase text-[10px] block">Major Accolades</span>
-                    <span className="text-[#f2ca50] font-semibold">{star.awardsCount || 14} Prestigious Awards</span>
+                    <span className="text-[#99907c] uppercase text-[10px] block">Place of Birth</span>
+                    <span className="text-[#f2ca50] font-semibold truncate block">{tmdbPerson?.place_of_birth || star.industry}</span>
                   </div>
                   <div>
-                    <span className="text-[#99907c] uppercase text-[10px] block">Language Footprint</span>
-                    <span className="text-[#FAF9F6] font-semibold">{star.language}</span>
+                    <span className="text-[#99907c] uppercase text-[10px] block">Primary Department</span>
+                    <span className="text-[#FAF9F6] font-semibold">{tmdbPerson?.known_for_department || star.roles[0]}</span>
                   </div>
                   <div>
-                    <span className="text-[#99907c] uppercase text-[10px] block">Top Brand Endorsements</span>
-                    <span className="text-[#FAF9F6] font-semibold">{star.topBrands?.[0] || 'Luxury Global Houses'}</span>
+                    <span className="text-[#99907c] uppercase text-[10px] block">IMDb Profile</span>
+                    {tmdbPerson?.imdb_id ? (
+                      <a
+                        href={`https://www.imdb.com/name/${tmdbPerson.imdb_id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[#f2ca50] hover:underline font-semibold"
+                      >
+                        View IMDb Page ↗
+                      </a>
+                    ) : (
+                      <span className="text-[#FAF9F6] font-semibold">Verified</span>
+                    )}
                   </div>
                 </div>
+              </div>
+            )}
+
+            {activeTab === 'tmdb_credits' && (
+              <div className="space-y-4">
+                {loadingTmdb ? (
+                  <div className="py-8 text-center text-xs font-mono text-[#d0c5af] animate-pulse">
+                    Loading complete TMDB movie credits...
+                  </div>
+                ) : castCredits.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+                    {castCredits.slice(0, 24).map((credit: any, idx: number) => (
+                      <div
+                        key={idx}
+                        className="bg-[#201f1f] border border-[#4d4635]/30 rounded-xl overflow-hidden p-3 flex gap-3 items-center group hover:border-[#f2ca50]/60 transition-all"
+                      >
+                        <img
+                          src={getTMDBImageUrl(credit.poster_path, 'w185')}
+                          alt={credit.title || credit.name}
+                          className="w-14 aspect-[2/3] object-cover rounded-lg border border-[#4d4635]/40"
+                          referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=300&q=80';
+                          }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-headline-sm text-sm text-[#FAF9F6] group-hover:text-[#f2ca50] transition-colors truncate">
+                            {credit.title || credit.name}
+                          </h4>
+                          <div className="text-[11px] text-[#99907c] font-mono mt-0.5 truncate">
+                            {credit.character ? `as ${credit.character}` : credit.release_date ? credit.release_date.split('-')[0] : 'Feature Film'}
+                          </div>
+                          {credit.vote_average ? (
+                            <div className="text-[11px] font-mono text-[#f2ca50] mt-1 flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[13px] fill-current">star</span>
+                              <span>{credit.vote_average.toFixed(1)} / 10</span>
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-8 text-center text-xs font-mono text-[#d0c5af] bg-[#201f1f] rounded-xl border border-[#4d4635]/20">
+                    TMDB credits loaded. Use AI Analysis to summarize box office milestones.
+                  </div>
+                )}
               </div>
             )}
 
@@ -382,65 +450,10 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
                 </div>
               </div>
             )}
-
-            {activeTab === 'tmdb_credits' && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono text-[#d0c5af]">
-                    Live TMDB Verified Credits &amp; Popularity
-                  </span>
-                  {tmdbPerson && (
-                    <span className="text-xs font-mono text-[#f2ca50] bg-[#f2ca50]/15 px-2.5 py-1 rounded border border-[#f2ca50]/30 font-bold">
-                      TMDB Popularity Index: ★ {tmdbPerson.popularity?.toFixed(1)}
-                    </span>
-                  )}
-                </div>
-
-                {loadingTmdb ? (
-                  <div className="py-8 text-center text-xs font-mono text-[#d0c5af] animate-pulse">
-                    Connecting to TMDB to fetch verified filmography...
-                  </div>
-                ) : tmdbPerson && tmdbPerson.known_for && tmdbPerson.known_for.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
-                    {tmdbPerson.known_for.map((credit: any, idx: number) => (
-                      <div
-                        key={idx}
-                        className="bg-[#201f1f] border border-[#4d4635]/30 rounded-xl overflow-hidden p-3 flex gap-3 items-center group hover:border-[#f2ca50]/60 transition-all"
-                      >
-                        <img
-                          src={getTMDBImageUrl(credit.poster_path, 'w185')}
-                          alt={credit.title || credit.name}
-                          className="w-14 aspect-[2/3] object-cover rounded-lg border border-[#4d4635]/40"
-                          referrerPolicy="no-referrer"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-headline-sm text-sm text-[#FAF9F6] group-hover:text-[#f2ca50] transition-colors truncate">
-                            {credit.title || credit.name}
-                          </h4>
-                          <div className="text-[11px] text-[#99907c] font-mono mt-0.5">
-                            {credit.release_date ? credit.release_date.split('-')[0] : 'Feature Film'}
-                          </div>
-                          {credit.vote_average ? (
-                            <div className="text-[11px] font-mono text-[#f2ca50] mt-1 flex items-center gap-1">
-                              <span className="material-symbols-outlined text-[13px] fill-current">star</span>
-                              <span>{credit.vote_average.toFixed(1)} / 10</span>
-                            </div>
-                          ) : null}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="p-8 text-center text-xs font-mono text-[#d0c5af] bg-[#201f1f] rounded-xl border border-[#4d4635]/20">
-                    Live TMDB credits synced. Use the AI Intelligence tool to analyze complete historical box office run.
-                  </div>
-                )}
-              </div>
-            )}
           </section>
         </div>
 
-        {/* Sidebar Column (4 Cols) - Exact Match to Screen 3 */}
+        {/* Sidebar Column (4 Cols) */}
         <div className="lg:col-span-4 space-y-8">
           {/* StarScore Trajectory Card */}
           <div
@@ -449,12 +462,12 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
           >
             <div className="flex items-center justify-between mb-4 z-10 relative">
               <h3 className="font-data-label text-[11px] text-[#d0c5af] uppercase tracking-widest">
-                StarScore Trajectory
+                StarScore™ Trajectory
               </h3>
               <span className="text-[10px] font-mono text-[#10B981]">Apex Velocity</span>
             </div>
 
-            {/* Decorative Interactive SVG Line Chart */}
+            {/* Interactive SVG Line Chart */}
             <div className="relative h-44 w-full flex items-end my-2">
               <div className="absolute inset-0 w-full h-full border-b border-l border-[#4d4635]/25" />
               
@@ -480,7 +493,6 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
                 />
               </svg>
 
-              {/* Data points info */}
               <div className="w-full flex justify-between text-[9px] font-mono text-[#d0c5af]/60 pt-2 z-10">
                 {trajectoryPoints.map((p) => (
                   <span key={p.label}>{p.label}</span>
@@ -488,13 +500,12 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
               </div>
             </div>
 
-            {/* Timeframe selector (1M, 3M, 6M, 1Y, ALL) */}
             <div className="flex justify-between items-center pt-4 border-t border-[#4d4635]/20 font-data-label text-xs text-[#d0c5af]">
               {(['1M', '3M', '6M', '1Y', 'ALL'] as const).map((tf) => (
                 <button
                   key={tf}
                   onClick={() => setActiveTimeframe(tf)}
-                  className={`px-2 py-1 transition-all ${
+                  className={`px-2 py-1 transition-all cursor-pointer ${
                     activeTimeframe === tf
                       ? 'text-[#f2ca50] border-b border-[#f2ca50] font-bold'
                       : 'hover:text-[#FAF9F6]'
@@ -515,7 +526,6 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
               Active Signals
             </h3>
 
-            {/* Signal 1: Audience Sentiment */}
             <div className="flex items-center gap-4 p-3.5 bg-[#201f1f] rounded-xl border border-[#4d4635]/20 hover:border-[#10B981]/40 transition-colors">
               <div className="w-10 h-10 rounded-full bg-[#10B981]/15 flex items-center justify-center shrink-0 border border-[#10B981]/30">
                 <span className="material-symbols-outlined text-[#10B981] text-[20px]">
@@ -527,12 +537,11 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
                   Audience Sentiment
                 </div>
                 <div className="font-body-md text-[14px] text-[#FAF9F6] font-semibold mt-0.5">
-                  {star.activeSignals.audienceSentiment}
+                  {star.activeSignals?.audienceSentiment || 'Overwhelmingly Positive'}
                 </div>
               </div>
             </div>
 
-            {/* Signal 2: Social Buzz Rate */}
             <div className="flex items-center gap-4 p-3.5 bg-[#201f1f] rounded-xl border border-[#4d4635]/20 hover:border-[#f2ca50]/40 transition-colors">
               <div className="w-10 h-10 rounded-full bg-[#f2ca50]/15 flex items-center justify-center shrink-0 border border-[#f2ca50]/30">
                 <span className="material-symbols-outlined text-[#f2ca50] text-[20px]">
@@ -544,7 +553,7 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
                   Social Buzz Rate
                 </div>
                 <div className="font-body-md text-[14px] text-[#FAF9F6] font-semibold mt-0.5">
-                  {star.activeSignals.socialBuzzRate}
+                  {star.activeSignals?.socialBuzzRate || 'High Velocity'}
                 </div>
               </div>
             </div>

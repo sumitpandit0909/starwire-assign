@@ -53,11 +53,33 @@ const StarDetailsRouteWrapper: React.FC<{
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const star = stars.find((s) => s.id === id || s.tmdbId?.toString() === id) || stars[0];
+  const foundStar = stars.find((s) => s.id === id || s.tmdbId?.toString() === id);
 
-  if (!star) {
-    return <Navigate to="/explore" replace />;
-  }
+  const star = foundStar || {
+    id: id || 'tmdb-star',
+    tmdbId: id,
+    name: 'Star Dossier',
+    category: 'Global',
+    roles: ['Actor'],
+    industry: 'Cinema',
+    dossierBio: 'Fetching live intelligence profile from TMDB...',
+    avatarImage: '',
+    coverImage: '',
+    buzzDelta: 12,
+    starScore: 88,
+    reach: '65M',
+    starScoreTotal: 288,
+    buzzMeter: 88,
+    globalReachCount: '65M',
+    engagementRate: '14.2%',
+    engagementDelta: 2.1,
+    debutYear: 2005,
+    awardsCount: 8,
+    language: 'English',
+    topBrands: ['Global Houses'],
+    activeSignals: { audienceSentiment: 'Overwhelmingly Positive', socialBuzzRate: 'High Velocity' },
+    films: [],
+  };
 
   return (
     <StarDetailsView
@@ -68,7 +90,7 @@ const StarDetailsRouteWrapper: React.FC<{
         navigate(`/star/${starId}`);
       }}
       onBackToExplore={() => navigate('/explore')}
-      isFollowing={followingIds.includes(star.id)}
+      isFollowing={followingIds.includes(star.id) || followingIds.includes(`tmdb-${star.id}`)}
       onToggleFollow={(starId) => toggleFollowStar(starId)}
       onOpenIntelligence={openIntelligenceModal}
     />

@@ -5,12 +5,11 @@ import {
   fetchPopularPeople,
   fetchTrendingPeople,
   searchTMDB,
-  fetchOpenRouterIntelligence,
 } from '../../services/tmdbService';
 
 interface ExploreStarsViewProps {
   stars?: Star[];
-  onSelectStar?: (starId: string) => void;
+  onSelectStar: (starId: string) => void;
   followingIds: string[];
   onToggleFollow: (starId: string, e?: React.MouseEvent) => void;
   onOpenIntelligence?: (name?: string) => void;
@@ -57,6 +56,7 @@ const SkeletonStarCard: React.FC = () => {
 
 export const ExploreStarsView: React.FC<ExploreStarsViewProps> = ({
   stars = [],
+  onSelectStar,
   followingIds,
   onToggleFollow,
 }) => {
@@ -66,11 +66,6 @@ export const ExploreStarsView: React.FC<ExploreStarsViewProps> = ({
   const [totalPages, setTotalPages] = useState<number>(1);
   const [people, setPeople] = useState<TMDBPerson[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
-  // Selected Star Modal
-  const [selectedPerson, setSelectedPerson] = useState<TMDBPerson | null>(null);
-  const [aiAnalysis, setAiAnalysis] = useState<string>('');
-  const [loadingAi, setLoadingAi] = useState<boolean>(false);
 
   // Load TMDB People (Popular, Trending, or Search Query)
   useEffect(() => {
@@ -151,22 +146,8 @@ export const ExploreStarsView: React.FC<ExploreStarsViewProps> = ({
     setPage(1);
   };
 
-  // Open Star Profile Modal
-  const handleOpenPersonModal = async (person: TMDBPerson) => {
-    setSelectedPerson(person);
-    setAiAnalysis('');
-    setLoadingAi(true);
-    try {
-      const intel = await fetchOpenRouterIntelligence(
-        `Provide a concise summary for actor/actress ${person.name}. Highlight recent films, career performance, and popularity.`,
-        person.name
-      );
-      setAiAnalysis(intel);
-    } catch (e) {
-      setAiAnalysis('Career summary unavailable.');
-    } finally {
-      setLoadingAi(false);
-    }
+  const handleStarClick = (person: TMDBPerson) => {
+    onSelectStar(person.id.toString());
   };
 
   return (
@@ -263,9 +244,9 @@ export const ExploreStarsView: React.FC<ExploreStarsViewProps> = ({
                 key={person.id}
                 className="bg-[#1c1b1b] border border-[#4d4635]/30 hover:border-[#f2ca50] rounded-2xl overflow-hidden flex flex-col justify-between transition-all group shadow-xl"
               >
-                {/* Profile Image Header */}
+                {/* Profile Image Header - Direct Page Navigation */}
                 <div
-                  onClick={() => handleOpenPersonModal(person)}
+                  onClick={() => handleStarClick(person)}
                   className="relative aspect-[3/4] w-full overflow-hidden bg-[#201f1f] cursor-pointer"
                 >
                   <img
@@ -296,7 +277,7 @@ export const ExploreStarsView: React.FC<ExploreStarsViewProps> = ({
                 <div className="p-4 flex flex-col justify-between flex-1">
                   <div>
                     <h3
-                      onClick={() => handleOpenPersonModal(person)}
+                      onClick={() => handleStarClick(person)}
                       className="font-headline-md text-base sm:text-lg text-[#FAF9F6] group-hover:text-[#f2ca50] transition-colors leading-tight cursor-pointer line-clamp-1"
                     >
                       {person.name}
@@ -316,10 +297,10 @@ export const ExploreStarsView: React.FC<ExploreStarsViewProps> = ({
                   {/* Simple Action Buttons */}
                   <div className="mt-4 pt-3 border-t border-[#4d4635]/25 flex items-center gap-2">
                     <button
-                      onClick={() => handleOpenPersonModal(person)}
+                      onClick={() => handleStarClick(person)}
                       className="flex-1 py-2 px-3 rounded-xl bg-[#2a2a2a] hover:bg-[#f2ca50] text-[#FAF9F6] hover:text-[#131313] font-bold text-xs uppercase transition-all flex items-center justify-center gap-1 cursor-pointer"
                     >
-                      <span>View Profile</span>
+                      <span>View Details</span>
                       <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
                     </button>
 
@@ -374,105 +355,6 @@ export const ExploreStarsView: React.FC<ExploreStarsViewProps> = ({
             <span>Next</span>
             <span className="material-symbols-outlined text-[16px]">chevron_right</span>
           </button>
-        </div>
-      )}
-
-      {/* Star Profile Modal */}
-      {selectedPerson && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#1c1b1b] border border-[#f2ca50]/50 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 relative">
-            <button
-              onClick={() => setSelectedPerson(null)}
-              className="absolute top-4 right-4 p-2 rounded-full bg-[#2a2a2a] text-[#FAF9F6] hover:bg-[#f2ca50] hover:text-[#131313] transition-all cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-[20px]">close</span>
-            </button>
-
-            <div className="flex flex-col sm:flex-row gap-6 items-start">
-              <img
-                src={getTMDBImageUrl(selectedPerson.profile_path, 'w500')}
-                alt={selectedPerson.name}
-                className="w-full sm:w-48 aspect-[3/4] object-cover rounded-xl border border-[#4d4635]/30 shadow-lg"
-                referrerPolicy="no-referrer"
-              />
-
-              <div className="flex-1 space-y-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-[#f2ca50]/20 text-[#f2ca50] border border-[#f2ca50]/40 font-bold">
-                    STAR PROFILE
-                  </span>
-                  <span className="text-xs font-mono text-[#99907c]">
-                    TMDB ID #{selectedPerson.id}
-                  </span>
-                </div>
-
-                <h2 className="font-headline-lg text-2xl md:text-3xl text-[#FAF9F6]">
-                  {selectedPerson.name}
-                </h2>
-
-                <div className="flex flex-wrap gap-4 text-xs font-mono">
-                  <div className="text-[#f2ca50]">
-                    Popularity: <strong>{selectedPerson.popularity?.toFixed(1)}</strong>
-                  </div>
-                  <div className="text-[#FAF9F6]">
-                    Role: <strong>{selectedPerson.known_for_department || 'Actor'}</strong>
-                  </div>
-                </div>
-
-                {selectedPerson.known_for && selectedPerson.known_for.length > 0 && (
-                  <div className="pt-2">
-                    <span className="text-xs font-mono text-[#99907c] block mb-1">
-                      Famous Films &amp; Works:
-                    </span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {selectedPerson.known_for.map((work, idx) => (
-                        <span
-                          key={idx}
-                          className="px-2.5 py-1 rounded-md bg-[#201f1f] text-[#FAF9F6] border border-[#4d4635]/30 text-xs font-mono"
-                        >
-                          {work.title || work.name} {work.release_date ? `(${work.release_date.split('-')[0]})` : ''}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* AI Summary Box */}
-                <div className="mt-4 p-4 rounded-xl bg-[#201f1f] border border-[#f2ca50]/30 space-y-2">
-                  <div className="flex items-center gap-2 text-xs font-mono text-[#f2ca50] font-bold">
-                    <span className="material-symbols-outlined text-[16px]">auto_awesome</span>
-                    <span>AI Career Summary</span>
-                  </div>
-
-                  {loadingAi ? (
-                    <div className="text-xs text-[#d0c5af] font-mono animate-pulse">
-                      Generating career summary...
-                    </div>
-                  ) : (
-                    <div className="text-xs text-[#FAF9F6] font-light leading-relaxed whitespace-pre-line">
-                      {aiAnalysis}
-                    </div>
-                  )}
-                </div>
-
-                <div className="pt-3 flex gap-3">
-                  <button
-                    onClick={(e) => {
-                      onToggleFollow(`tmdb-${selectedPerson.id}`, e);
-                    }}
-                    className="flex-1 py-2.5 px-4 rounded-xl bg-[#f2ca50] text-[#131313] font-bold text-xs uppercase hover:bg-[#d4af37] transition-all flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <span className="material-symbols-outlined text-[16px]">bookmark_add</span>
-                    <span>
-                      {followingIds.includes(`tmdb-${selectedPerson.id}`)
-                        ? 'Following Star'
-                        : 'Follow Star'}
-                    </span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       )}
     </div>

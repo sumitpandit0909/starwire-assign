@@ -41,10 +41,10 @@ export const MoviesView: React.FC<MoviesViewProps> = () => {
         </div>
 
         {/* Clean 3 Tabs: Popular | Top Rated | Upcoming */}
-        <div className="flex items-center bg-[#1c1b1b] p-1 rounded-xl border border-[#4d4635]/30 self-start md:self-auto ml-auto">
+        <div className="flex items-center bg-[#1c1b1b] p-1 rounded-xl border border-[#4d4635]/30 self-start md:self-auto w-full sm:w-auto">
           <button
             onClick={() => setActiveTab('popular')}
-            className={`px-4 py-2 text-xs font-mono rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+            className={`flex-1 sm:flex-initial px-3.5 sm:px-4 py-2 text-xs font-mono rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'popular'
                 ? 'bg-[#f2ca50] text-[#131313] font-bold shadow-md'
                 : 'text-[#d0c5af] hover:text-[#FAF9F6]'
@@ -56,7 +56,7 @@ export const MoviesView: React.FC<MoviesViewProps> = () => {
 
           <button
             onClick={() => setActiveTab('top_rated')}
-            className={`px-4 py-2 text-xs font-mono rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+            className={`flex-1 sm:flex-initial px-3.5 sm:px-4 py-2 text-xs font-mono rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'top_rated'
                 ? 'bg-[#f2ca50] text-[#131313] font-bold shadow-md'
                 : 'text-[#d0c5af] hover:text-[#FAF9F6]'
@@ -68,7 +68,7 @@ export const MoviesView: React.FC<MoviesViewProps> = () => {
 
           <button
             onClick={() => setActiveTab('upcoming')}
-            className={`px-4 py-2 text-xs font-mono rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+            className={`flex-1 sm:flex-initial px-3.5 sm:px-4 py-2 text-xs font-mono rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'upcoming'
                 ? 'bg-[#f2ca50] text-[#131313] font-bold shadow-md'
                 : 'text-[#d0c5af] hover:text-[#FAF9F6]'
@@ -81,7 +81,7 @@ export const MoviesView: React.FC<MoviesViewProps> = () => {
       </div>
 
       {/* Status Bar */}
-      <div className="flex items-center justify-between text-xs font-mono text-[#d0c5af]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 text-xs font-mono text-[#d0c5af]">
         <span>
           {activeTab === 'popular'
             ? 'Popular Movies worldwide'
@@ -94,13 +94,13 @@ export const MoviesView: React.FC<MoviesViewProps> = () => {
 
       {/* Content Grid / Skeleton Loading */}
       {isLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
             <SkeletonMovieCard key={n} />
           ))}
         </div>
       ) : tmdbMovies.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {tmdbMovies.map((movie, idx) => (
             <div
               key={movie.id}

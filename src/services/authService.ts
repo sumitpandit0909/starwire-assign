@@ -1,4 +1,5 @@
 import { UserStats } from '../types';
+import { getApiUrl } from './apiConfig';
 
 export interface SignUpData {
   Name: string;
@@ -74,7 +75,7 @@ export function logoutUser() {
  */
 export async function apiSignUp(data: SignUpData): Promise<AuthResponse> {
   try {
-    const res = await fetch('/api/auth/signup', {
+    const res = await fetch(getApiUrl('/api/auth/signup'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -101,7 +102,7 @@ export async function apiSignUp(data: SignUpData): Promise<AuthResponse> {
  */
 export async function apiSignIn(data: SignInData): Promise<AuthResponse> {
   try {
-    const res = await fetch('/api/auth/signin', {
+    const res = await fetch(getApiUrl('/api/auth/signin'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -128,7 +129,7 @@ export async function apiSignIn(data: SignInData): Promise<AuthResponse> {
  */
 export async function apiForgotPassword(email: string): Promise<AuthResponse> {
   try {
-    const res = await fetch('/api/auth/forgot-password', {
+    const res = await fetch(getApiUrl('/api/auth/forgot-password'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ Email: email }),
@@ -151,7 +152,7 @@ export async function apiForgotPassword(email: string): Promise<AuthResponse> {
  */
 export async function apiResetPassword(data: { Email: string; Code: string; NewPassword: string }): Promise<AuthResponse> {
   try {
-    const res = await fetch('/api/auth/reset-password', {
+    const res = await fetch(getApiUrl('/api/auth/reset-password'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -181,7 +182,7 @@ export async function apiGetMe(): Promise<any | null> {
   if (!token) return null;
 
   try {
-    const res = await fetch('/api/auth/me', {
+    const res = await fetch(getApiUrl('/api/auth/me'), {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -203,7 +204,7 @@ export async function apiToggleFollowStar(starId: string): Promise<any> {
   if (!token) return null;
 
   try {
-    const res = await fetch('/api/user/follow-star', {
+    const res = await fetch(getApiUrl('/api/user/follow-star'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -226,7 +227,7 @@ export async function apiToggleBookmarkNews(newsId: string): Promise<any> {
   if (!token) return null;
 
   try {
-    const res = await fetch('/api/user/bookmark-news', {
+    const res = await fetch(getApiUrl('/api/user/bookmark-news'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -249,7 +250,7 @@ export async function apiSyncUserActivity(followedStars: string[], bookmarkedNew
   if (!token) return null;
 
   try {
-    const res = await fetch('/api/user/sync-activity', {
+    const res = await fetch(getApiUrl('/api/user/sync-activity'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -272,7 +273,7 @@ export async function apiGetUserActivity(): Promise<{ followedStars: string[]; b
   if (!token) return null;
 
   try {
-    const res = await fetch('/api/user/activity', {
+    const res = await fetch(getApiUrl('/api/user/activity'), {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -284,4 +285,3 @@ export async function apiGetUserActivity(): Promise<{ followedStars: string[]; b
     return null;
   }
 }
-

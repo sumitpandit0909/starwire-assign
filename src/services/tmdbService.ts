@@ -1,4 +1,5 @@
 import { TMDBMovie, TMDBPerson, Star, NewsBrief, RegionalPerformance, PlatformBuzz } from '../types';
+import { getApiUrl } from './apiConfig';
 
 export const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
 
@@ -202,7 +203,7 @@ export async function fetchHealthCheck(): Promise<{
   openRouterModel?: string;
 }> {
   try {
-    const res = await fetch('/api/health');
+    const res = await fetch(getApiUrl('/api/health'));
     if (!res.ok) throw new Error('Health check failed');
     return await res.json();
   } catch (e) {
@@ -225,7 +226,7 @@ export async function fetchLiveNews(category?: string, query?: string, page = 1)
     if (query) params.set('q', query);
     params.set('page', page.toString());
     
-    const res = await fetch(`/api/news?${params.toString()}`);
+    const res = await fetch(getApiUrl(`/api/news?${params.toString()}`));
     if (!res.ok) throw new Error('Failed to fetch live news');
     const data = await res.json();
     const articles = data.articles || [];
@@ -245,7 +246,7 @@ export async function fetchLiveNews(category?: string, query?: string, page = 1)
 // Live Stars Dossiers from TMDB
 export async function fetchLiveStars(): Promise<Star[]> {
   try {
-    const res = await fetch('/api/stars');
+    const res = await fetch(getApiUrl('/api/stars'));
     if (!res.ok) throw new Error('Failed to fetch live stars');
     const data = await res.json();
     const stars = data.stars || [];
@@ -261,7 +262,7 @@ export async function fetchLiveStars(): Promise<Star[]> {
 
 export async function fetchLiveStarDetails(id: string): Promise<Star | null> {
   try {
-    const res = await fetch(`/api/stars/${encodeURIComponent(id)}`);
+    const res = await fetch(getApiUrl(`/api/stars/${encodeURIComponent(id)}`));
     if (!res.ok) throw new Error('Failed to fetch live star details');
     const data = await res.json();
     return data.star || FALLBACK_STARS[0];
@@ -274,7 +275,7 @@ export async function fetchLiveStarDetails(id: string): Promise<Star | null> {
 // Live Regional & Platform Analytics
 export async function fetchMarketPulse(): Promise<{ regionalStats: RegionalPerformance[]; platformBuzz: PlatformBuzz[] }> {
   try {
-    const res = await fetch('/api/market-pulse');
+    const res = await fetch(getApiUrl('/api/market-pulse'));
     if (!res.ok) throw new Error('Failed to fetch market pulse');
     return await res.json();
   } catch (e) {
@@ -300,7 +301,7 @@ export async function fetchTrendingMovies(timeWindowOrPage: 'day' | 'week' | num
   const timeWindow = typeof timeWindowOrPage === 'string' ? timeWindowOrPage : 'day';
   const pageNum = typeof timeWindowOrPage === 'number' ? timeWindowOrPage : page;
   try {
-    const res = await fetch(`/api/tmdb/trending-movies?timeWindow=${timeWindow}&page=${pageNum}`);
+    const res = await fetch(getApiUrl(`/api/tmdb/trending-movies?timeWindow=${timeWindow}&page=${pageNum}`));
     if (!res.ok) throw new Error('Failed to fetch trending movies');
     return await res.json();
   } catch (e) {
@@ -311,7 +312,7 @@ export async function fetchTrendingMovies(timeWindowOrPage: 'day' | 'week' | num
 
 export async function fetchPopularMovies(page = 1): Promise<{ results: TMDBMovie[]; total_results: number }> {
   try {
-    const res = await fetch(`/api/tmdb/popular-movies?page=${page}`);
+    const res = await fetch(getApiUrl(`/api/tmdb/popular-movies?page=${page}`));
     if (!res.ok) throw new Error('Failed to fetch popular movies');
     return await res.json();
   } catch (e) {
@@ -322,7 +323,7 @@ export async function fetchPopularMovies(page = 1): Promise<{ results: TMDBMovie
 
 export async function fetchTopRatedMovies(page = 1): Promise<{ results: TMDBMovie[]; total_results: number }> {
   try {
-    const res = await fetch(`/api/tmdb/top-rated-movies?page=${page}`);
+    const res = await fetch(getApiUrl(`/api/tmdb/top-rated-movies?page=${page}`));
     if (!res.ok) throw new Error('Failed to fetch top rated movies');
     return await res.json();
   } catch (e) {
@@ -333,7 +334,7 @@ export async function fetchTopRatedMovies(page = 1): Promise<{ results: TMDBMovi
 
 export async function fetchIndianCinema(page = 1, sortBy = 'popularity.desc', language = 'hi|ta|te|ml|kn'): Promise<{ results: TMDBMovie[]; total_results: number }> {
   try {
-    const res = await fetch(`/api/tmdb/indian-cinema?page=${page}&sortBy=${sortBy}&language=${language}`);
+    const res = await fetch(getApiUrl(`/api/tmdb/indian-cinema?page=${page}&sortBy=${sortBy}&language=${language}`));
     if (!res.ok) throw new Error('Failed to fetch Indian cinema');
     return await res.json();
   } catch (e) {
@@ -344,7 +345,7 @@ export async function fetchIndianCinema(page = 1, sortBy = 'popularity.desc', la
 
 export async function fetchNowPlaying(page = 1): Promise<{ results: TMDBMovie[]; total_results: number }> {
   try {
-    const res = await fetch(`/api/tmdb/now-playing?page=${page}`);
+    const res = await fetch(getApiUrl(`/api/tmdb/now-playing?page=${page}`));
     if (!res.ok) throw new Error('Failed to fetch now playing');
     return await res.json();
   } catch (e) {
@@ -355,7 +356,7 @@ export async function fetchNowPlaying(page = 1): Promise<{ results: TMDBMovie[];
 
 export async function fetchUpcoming(page = 1): Promise<{ results: TMDBMovie[]; total_results: number }> {
   try {
-    const res = await fetch(`/api/tmdb/upcoming?page=${page}`);
+    const res = await fetch(getApiUrl(`/api/tmdb/upcoming?page=${page}`));
     if (!res.ok) throw new Error('Failed to fetch upcoming movies');
     return await res.json();
   } catch (e) {
@@ -368,7 +369,7 @@ export async function fetchTrendingPeople(timeWindowOrPage: 'day' | 'week' | num
   const timeWindow = typeof timeWindowOrPage === 'string' ? timeWindowOrPage : 'day';
   const pageNum = typeof timeWindowOrPage === 'number' ? timeWindowOrPage : page;
   try {
-    const res = await fetch(`/api/tmdb/trending-people?timeWindow=${timeWindow}&page=${pageNum}`);
+    const res = await fetch(getApiUrl(`/api/tmdb/trending-people?timeWindow=${timeWindow}&page=${pageNum}`));
     if (!res.ok) throw new Error('Failed to fetch trending people');
     return await res.json();
   } catch (e) {
@@ -381,7 +382,7 @@ export async function fetchTrendingTV(timeWindowOrPage: 'day' | 'week' | number 
   const timeWindow = typeof timeWindowOrPage === 'string' ? timeWindowOrPage : 'day';
   const pageNum = typeof timeWindowOrPage === 'number' ? timeWindowOrPage : page;
   try {
-    const res = await fetch(`/api/tmdb/trending-tv?timeWindow=${timeWindow}&page=${pageNum}`);
+    const res = await fetch(getApiUrl(`/api/tmdb/trending-tv?timeWindow=${timeWindow}&page=${pageNum}`));
     if (!res.ok) throw new Error('Failed to fetch trending TV');
     return await res.json();
   } catch (e) {
@@ -392,7 +393,7 @@ export async function fetchTrendingTV(timeWindowOrPage: 'day' | 'week' | number 
 
 export async function fetchPopularPeople(page = 1): Promise<{ results: TMDBPerson[]; total_results: number }> {
   try {
-    const res = await fetch(`/api/tmdb/popular-people?page=${page}`);
+    const res = await fetch(getApiUrl(`/api/tmdb/popular-people?page=${page}`));
     if (!res.ok) throw new Error('Failed to fetch popular people');
     return await res.json();
   } catch (e) {
@@ -403,7 +404,7 @@ export async function fetchPopularPeople(page = 1): Promise<{ results: TMDBPerso
 
 export async function fetchPersonDetails(id: number | string): Promise<TMDBPerson | null> {
   try {
-    const res = await fetch(`/api/tmdb/person/${id}`);
+    const res = await fetch(getApiUrl(`/api/tmdb/person/${id}`));
     if (!res.ok) throw new Error('Failed to fetch person details');
     return await res.json();
   } catch (e) {
@@ -414,7 +415,7 @@ export async function fetchPersonDetails(id: number | string): Promise<TMDBPerso
 
 export async function fetchMovieDetails(id: number | string): Promise<TMDBMovie | null> {
   try {
-    const res = await fetch(`/api/tmdb/movie/${id}`);
+    const res = await fetch(getApiUrl(`/api/tmdb/movie/${id}`));
     if (!res.ok) throw new Error('Failed to fetch movie details');
     return await res.json();
   } catch (e) {
@@ -425,7 +426,7 @@ export async function fetchMovieDetails(id: number | string): Promise<TMDBMovie 
 
 export async function fetchSimilarMovies(id: number | string): Promise<{ results: TMDBMovie[] }> {
   try {
-    const res = await fetch(`/api/tmdb/movie/${id}/similar`);
+    const res = await fetch(getApiUrl(`/api/tmdb/movie/${id}/similar`));
     if (!res.ok) throw new Error('Failed to fetch similar movies');
     return await res.json();
   } catch (e) {
@@ -437,7 +438,7 @@ export async function fetchSimilarMovies(id: number | string): Promise<{ results
 export async function searchTMDB(query: string, type: 'multi' | 'movie' | 'person' = 'multi', page = 1): Promise<{ results: (TMDBMovie | TMDBPerson)[]; total_results: number }> {
   try {
     if (!query.trim()) return { results: [], total_results: 0 };
-    const res = await fetch(`/api/tmdb/search?query=${encodeURIComponent(query)}&type=${type}&page=${page}`);
+    const res = await fetch(getApiUrl(`/api/tmdb/search?query=${encodeURIComponent(query)}&type=${type}&page=${page}`));
     if (!res.ok) throw new Error('Failed to search TMDB');
     return await res.json();
   } catch (e) {
@@ -449,7 +450,7 @@ export async function searchTMDB(query: string, type: 'multi' | 'movie' | 'perso
 // OpenRouter AI Intelligence Engine (nvidia/nemotron-3.5-lightning:free)
 export async function fetchOpenRouterIntelligence(prompt: string, starName?: string, context?: any): Promise<string> {
   try {
-    const res = await fetch('/api/intelligence', {
+    const res = await fetch(getApiUrl('/api/intelligence'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ prompt, starName, context }),

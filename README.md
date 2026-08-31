@@ -154,38 +154,30 @@ Backend API server runs at: `http://localhost:5000`
 
 ---
 
-## 🌐 Deploying Fullstack (Frontend & Express Backend) to Vercel
+## 🌐 Deploying Frontend & Backend Separately
 
-STARWIRE is configured for **unified single-click Vercel deployment** hosting both the React Vite frontend and Express serverless backend API.
+STARWIRE supports **separate deployment** for the Frontend (Vercel, Netlify, Cloudflare Pages) and Backend (Render, Railway, Heroku, AWS, VPS, or Vercel API).
 
-### 1. Vercel Configuration Files
-- **`vercel.json`**: Configures rewrites routing `/api/*` to the serverless function (`api/index.ts`) and all other routes to React client router (`dist/index.html`).
-- **`api/index.ts`**: Entry point wrapping the Express backend app into a Vercel Serverless Function.
+### 1. Deploying the Backend (Express API)
+- Host the `backend/` directory on your platform of choice (Render, Railway, Vercel, VPS).
+- Set Environment Variables on your backend hosting platform:
+  - `MONGODB_URI`: MongoDB Atlas connection string
+  - `JWT_SECRET`: Secret key for JWT auth
+  - `TMDB_API_KEY`: TMDB API key
+  - `OPENROUTER_API_KEY`: OpenRouter AI API key
+  - `OPENROUTER_MODEL`: `google/gemini-2.5-flash` or `nvidia/nemotron-3.5-lightning:free`
+  - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`
+- Command to run backend: `npm start` (or `tsx server.ts`).
+- Copy your deployed backend URL (e.g. `https://starwire-backend.onrender.com`).
 
-### 2. Environment Variables on Vercel
-In your Vercel Project Settings $\rightarrow$ **Environment Variables**, add:
-
-| Key | Example / Description |
-| :--- | :--- |
-| `MONGODB_URI` | `mongodb+srv://user:pass@cluster.mongodb.net/starwire` |
-| `JWT_SECRET` | `your_secure_jwt_secret_key` |
-| `TMDB_API_KEY` | `your_tmdb_api_key` |
-| `TMDB_READ_ACCESS_TOKEN` | `your_tmdb_read_access_token` |
-| `OPENROUTER_API_KEY` | `sk-or-v1-...` |
-| `OPENROUTER_MODEL` | `google/gemini-2.5-flash` |
-| `SMTP_HOST` | `smtp.gmail.com` |
-| `SMTP_PORT` | `587` |
-| `SMTP_USER` | `your_email@gmail.com` |
-| `SMTP_PASS` | `your_app_password` |
-| `SMTP_FROM` | `"STARWIRE Security" <your_email@gmail.com>` |
-
-### 3. Deploy via Vercel CLI or GitHub
-- **Option A (GitHub Integration)**: Push your repo to GitHub and import it directly into Vercel. Vercel will automatically detect `vercel.json` and build both frontend and serverless API.
-- **Option B (Vercel CLI)**:
-```bash
-npm install -g vercel
-vercel --prod
-```
+### 2. Deploying the Frontend (React Vite)
+- Host the root directory on Vercel, Netlify, or Cloudflare Pages.
+- Set the Frontend Environment Variable:
+  ```env
+  VITE_BACKEND_URL=https://your-deployed-backend-url.com
+  ```
+- Build Command: `npm run build`
+- Output Directory: `dist`
 
 ---
 

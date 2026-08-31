@@ -19,6 +19,7 @@ import {
   getPopularPeople,
   getPersonDetails,
   getMovieDetails,
+  getSimilarMovies,
   searchTMDBProxy,
   getStarsAggregated,
   getStarById,
@@ -80,6 +81,7 @@ app.get('/api/tmdb/upcoming', getUpcoming);
 app.get('/api/tmdb/trending-people', getTrendingPeople);
 app.get('/api/tmdb/popular-people', getPopularPeople);
 app.get('/api/tmdb/person/:id', getPersonDetails);
+app.get('/api/tmdb/movie/:id/similar', getSimilarMovies);
 app.get('/api/tmdb/movie/:id', getMovieDetails);
 app.get('/api/tmdb/search', searchTMDBProxy);
 

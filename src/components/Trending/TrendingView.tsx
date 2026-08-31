@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Star, TMDBPerson, TMDBMovie } from '../../types';
 import {
   getTMDBImageUrl,
@@ -51,6 +52,7 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
   onToggleFollow,
   onOpenIntelligence,
 }) => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'people' | 'movies' | 'tv'>('people');
   
   // Real TMDB data states sorted by popularity
@@ -348,7 +350,7 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
               {trendingMovies.map((movie, idx) => (
                 <div
                   key={movie.id}
-                  onClick={() => setSelectedMovie(movie)}
+                  onClick={() => navigate(`/movie/${movie.id}`)}
                   className="bg-[#1c1b1b] border border-[#4d4635]/30 hover:border-[#f2ca50] rounded-2xl overflow-hidden flex flex-col justify-between transition-all group cursor-pointer shadow-lg"
                 >
                   <div className="relative aspect-[2/3] w-full overflow-hidden bg-[#201f1f]">

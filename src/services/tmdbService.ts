@@ -5,7 +5,7 @@ export const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
 export function getTMDBImageUrl(
   path: string | null | undefined,
   size: 'w185' | 'w342' | 'w500' | 'w780' | 'w1280' | 'original' = 'w500',
-  fallbackType: 'poster' | 'profile' | 'backdrop' = 'poster'
+  fallbackType: 'poster' | 'profile' | 'backdrop' | 'logo' = 'poster'
 ): string {
   if (path && path.startsWith('http')) return path;
   if (!path) {
@@ -238,6 +238,17 @@ export async function fetchMovieDetails(id: number | string): Promise<TMDBMovie 
   } catch (e) {
     console.warn('TMDB fetch error:', e);
     return null;
+  }
+}
+
+export async function fetchSimilarMovies(id: number | string): Promise<{ results: TMDBMovie[] }> {
+  try {
+    const res = await fetch(`/api/tmdb/movie/${id}/similar`);
+    if (!res.ok) throw new Error('Failed to fetch similar movies');
+    return await res.json();
+  } catch (e) {
+    console.warn('TMDB fetch error:', e);
+    return { results: [] };
   }
 }
 

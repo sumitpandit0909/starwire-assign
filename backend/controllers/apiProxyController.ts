@@ -481,6 +481,17 @@ export async function getMovieDetails(req: Request, res: Response) {
   }
 }
 
+export async function getSimilarMovies(req: Request, res: Response) {
+  try {
+    const movieId = req.params.id;
+    const page = (req.query.page as string) || '1';
+    const data = await fetchTMDB(`/movie/${movieId}/similar`, { page });
+    res.json(data);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 export async function searchTMDBProxy(req: Request, res: Response) {
   try {
     const query = (req.query.query as string) || '';

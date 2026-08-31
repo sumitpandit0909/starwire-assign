@@ -24,6 +24,7 @@ import { RequestAccessView } from './components/Auth/RequestAccessView';
 import { WatchlistView } from './components/Watchlist/WatchlistView';
 import { TrendingView } from './components/Trending/TrendingView';
 import { MoviesView } from './components/Movies/MoviesView';
+import { MovieDetailsView } from './components/MovieDetails/MovieDetailsView';
 import { NewsListView } from './components/News/NewsListView';
 
 // Modals
@@ -95,6 +96,14 @@ const StarDetailsRouteWrapper: React.FC<{
       onOpenIntelligence={openIntelligenceModal}
     />
   );
+};
+
+// Dynamic Movie Details Route Wrapper
+const MovieDetailsRouteWrapper: React.FC<{
+  openIntelligenceModal: (title?: string) => void;
+}> = ({ openIntelligenceModal }) => {
+  const { id } = useParams<{ id: string }>();
+  return <MovieDetailsView movieId={id || ''} onOpenIntelligence={openIntelligenceModal} />;
 };
 
 // Main Terminal Layout Container
@@ -309,6 +318,11 @@ const MainLayout: React.FC<{
                   onOpenIntelligence={openIntelligenceModal}
                 />
               }
+            />
+
+            <Route
+              path="/movie/:id"
+              element={<MovieDetailsRouteWrapper openIntelligenceModal={openIntelligenceModal} />}
             />
 
             <Route

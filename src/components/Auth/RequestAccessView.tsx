@@ -347,6 +347,7 @@ export const RequestAccessView: React.FC<RequestAccessViewProps> = ({
                 : forgotStep === 'verify'
                 ? `Enter the 6-digit code dispatched to ${email}`
                 : 'Create a new secure password for your account.'}
+            </p>
           </div>
 
           {/* Feedback Banners */}

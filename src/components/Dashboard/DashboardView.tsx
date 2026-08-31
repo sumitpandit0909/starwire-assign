@@ -188,50 +188,50 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* 2. Hero Section & Command Panels */}
       <section
         id="dashboard-hero-section"
-        className="relative w-full rounded-2xl overflow-hidden bg-[#1c1b1b] border border-[#f2ca50]/20 min-h-[360px] md:min-h-[400px] flex flex-col justify-end shadow-2xl"
+        className="relative w-full rounded-2xl overflow-hidden bg-[#1c1b1b] border border-[#f2ca50]/20 min-h-[300px] sm:min-h-[340px] md:min-h-[380px] flex flex-col justify-between shadow-2xl"
       >
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-luminosity transform scale-100 hover:scale-102 transition-transform duration-1000"
+          className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-luminosity transform scale-100 hover:scale-102 transition-transform duration-1000"
           style={{
             backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuCh_JKurjhZM8yZUnaGeoWyh2B-SCWPXwXdVLYtRonFK3fAuvEsdc1BXkzlAeXxfGHO4tjFSSoMzfCiHxfeA9bFP1vdR5YaSs0H6y3ceWDg8X7RFYhwJWopD6vCCMRSNYcWwIPLmaJyvJ1M8Fe0-6o7gEmV5S0_sfcjKL4MdI1o2kzLIXxAe3R72YTuYWe0JtviJ7QIoxuguTS_lMkdn9sfw-kI_cnPdoaV0k4IVYMV8xj9VKO7MOErCw')`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#131313] via-[#131313]/85 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#131313] via-[#131313]/90 to-[#131313]/40" />
 
         {/* Top Floating Badge */}
-        <div className="absolute top-4 left-4 md:top-8 md:left-10 flex flex-wrap items-center gap-2 md:gap-3 z-10">
-          <span className="font-wordmark text-[10px] sm:text-[12px] uppercase tracking-[0.2em] sm:tracking-[0.35em] text-[#f2ca50]">
+        <div className="relative pt-4 px-4 sm:pt-6 sm:px-6 md:pt-8 md:px-8 z-10 flex flex-wrap items-center gap-2">
+          <span className="font-wordmark text-[9px] sm:text-[10px] uppercase tracking-[0.2em] sm:tracking-[0.3em] text-[#f2ca50] bg-[#131313]/80 px-2.5 py-1 rounded-md border border-[#f2ca50]/30 backdrop-blur-sm">
             ENTERTAINMENT INTELLIGENCE · STARWIRE
           </span>
           <div className="hidden sm:inline-block h-1.5 w-1.5 rounded-full bg-[#10B981]" />
-          <span className="hidden sm:inline-block font-data-label text-[9px] sm:text-[10px] text-[#d0c5af] uppercase tracking-widest">
+          <span className="hidden sm:inline-block font-data-label text-[8px] sm:text-[9px] text-[#d0c5af] uppercase tracking-widest bg-[#131313]/60 px-2 py-0.5 rounded">
             REAL-TIME ANALYTICS
           </span>
         </div>
 
         {/* Hero Content */}
-        <div className="relative p-4 sm:p-6 md:p-10 z-10 max-w-5xl">
+        <div className="relative p-4 sm:p-5 md:p-8 z-10 max-w-4xl pt-2 sm:pt-4">
           <h1
             id="hero-greeting-heading"
-            className="font-headline-xl text-2xl sm:text-4xl md:text-5xl text-[#FAF9F6] mb-2 leading-tight tracking-tight break-words font-bold"
+            className="font-headline-xl text-xl sm:text-2xl md:text-3xl lg:text-4xl text-[#FAF9F6] mb-1.5 leading-tight tracking-tight break-words font-bold"
           >
             Good Evening, {user.userName.split(' ')[0]}.
           </h1>
-          <p className="font-body-lg text-xs sm:text-base md:text-[17px] text-[#d0c5af] mb-4 sm:mb-6 max-w-2xl font-light leading-relaxed">
+          <p className="font-body-lg text-[11px] sm:text-xs md:text-sm text-[#d0c5af] mb-3 sm:mb-4 max-w-xl font-light leading-relaxed">
             Live box office momentum, StarScore™ talent equity benchmarks, and industry alerts.
           </p>
 
           {/* Quick Metrics Bar */}
-          <div className="flex flex-wrap items-center gap-3 md:gap-4 pt-2">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-1">
             <div
               id="stat-box-following"
               onClick={onOpenFollowing}
-              className="glass-panel border border-[#4d4635]/30 rounded-xl px-5 py-3 flex flex-col gap-0.5 min-w-[110px] md:min-w-[130px] hover:border-[#f2ca50]/50 transition-all cursor-pointer group"
+              className="glass-panel border border-[#4d4635]/30 rounded-xl px-3.5 py-2 sm:px-4 sm:py-2.5 flex flex-col gap-0.5 min-w-[95px] sm:min-w-[110px] hover:border-[#f2ca50]/50 transition-all cursor-pointer group"
             >
-              <span className="font-data-label text-[10px] text-[#d0c5af] uppercase tracking-widest group-hover:text-[#f2ca50] transition-colors">
+              <span className="font-data-label text-[9px] sm:text-[10px] text-[#d0c5af] uppercase tracking-wider group-hover:text-[#f2ca50] transition-colors">
                 Tracked Stars
               </span>
-              <span className="font-headline-md text-2xl text-[#f2ca50] font-bold">
+              <span className="font-headline-md text-lg sm:text-xl text-[#f2ca50] font-bold">
                 {followingIds.length}
               </span>
             </div>
@@ -239,12 +239,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div
               id="stat-box-watchlist"
               onClick={onOpenWatchlist}
-              className="glass-panel border border-[#4d4635]/30 rounded-xl px-5 py-3 flex flex-col gap-0.5 min-w-[110px] md:min-w-[130px] hover:border-[#f2ca50]/50 transition-all cursor-pointer group"
+              className="glass-panel border border-[#4d4635]/30 rounded-xl px-3.5 py-2 sm:px-4 sm:py-2.5 flex flex-col gap-0.5 min-w-[95px] sm:min-w-[110px] hover:border-[#f2ca50]/50 transition-all cursor-pointer group"
             >
-              <span className="font-data-label text-[10px] text-[#d0c5af] uppercase tracking-widest group-hover:text-[#f2ca50] transition-colors">
+              <span className="font-data-label text-[9px] sm:text-[10px] text-[#d0c5af] uppercase tracking-wider group-hover:text-[#f2ca50] transition-colors">
                 Saved Intel
               </span>
-              <span className="font-headline-md text-2xl text-[#f2ca50] font-bold">
+              <span className="font-headline-md text-lg sm:text-xl text-[#f2ca50] font-bold">
                 {watchlistCount}
               </span>
             </div>
@@ -252,12 +252,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div
               id="stat-box-updates"
               onClick={onViewAllNews}
-              className="glass-panel border border-[#4d4635]/30 rounded-xl px-5 py-3 flex flex-col gap-0.5 min-w-[110px] md:min-w-[130px] hover:border-[#f2ca50]/50 transition-all cursor-pointer group"
+              className="glass-panel border border-[#4d4635]/30 rounded-xl px-3.5 py-2 sm:px-4 sm:py-2.5 flex flex-col gap-0.5 min-w-[95px] sm:min-w-[110px] hover:border-[#f2ca50]/50 transition-all cursor-pointer group"
             >
-              <span className="font-data-label text-[10px] text-[#d0c5af] uppercase tracking-widest group-hover:text-[#f2ca50] transition-colors">
+              <span className="font-data-label text-[9px] sm:text-[10px] text-[#d0c5af] uppercase tracking-wider group-hover:text-[#f2ca50] transition-colors">
                 Live Briefs
               </span>
-              <span className="font-headline-md text-2xl text-[#f2ca50] font-bold">
+              <span className="font-headline-md text-lg sm:text-xl text-[#f2ca50] font-bold">
                 {news.length}
               </span>
             </div>
@@ -266,7 +266,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <button
                 id="hero-ai-intelligence-btn"
                 onClick={() => onOpenIntelligence()}
-                className="flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-[#d4af37] to-[#f2ca50] text-[#131313] font-bold font-data-label text-[12px] uppercase tracking-wider transition-all hover:shadow-[0_0_20px_rgba(242,202,80,0.4)] hover:scale-102 cursor-pointer"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#d4af37] to-[#f2ca50] text-[#131313] font-bold font-data-label text-xs uppercase tracking-wider transition-all hover:shadow-[0_0_20px_rgba(242,202,80,0.4)] hover:scale-102 cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
                 <span>AI Starwire Intelligence</span>
@@ -274,7 +274,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
               <button
                 onClick={onExploreStars}
-                className="hidden sm:flex items-center gap-2 px-4 py-3 rounded-xl border border-[#d4af37]/40 text-[#f2ca50] hover:bg-[#d4af37]/10 font-data-label text-[12px] uppercase tracking-wider transition-all cursor-pointer"
+                className="hidden sm:flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-[#d4af37]/40 text-[#f2ca50] hover:bg-[#d4af37]/10 font-data-label text-xs uppercase tracking-wider transition-all cursor-pointer"
               >
                 <span>Talent Index</span>
                 <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
@@ -305,8 +305,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 key={period}
                 onClick={() => setBuzzTimeframe(period)}
                 className={`px-3 py-1 text-xs font-mono rounded-lg transition-all cursor-pointer ${buzzTimeframe === period
-                    ? 'bg-[#f2ca50] text-[#131313] font-bold shadow-sm'
-                    : 'text-[#d0c5af] hover:text-[#FAF9F6]'
+                  ? 'bg-[#f2ca50] text-[#131313] font-bold shadow-sm'
+                  : 'text-[#d0c5af] hover:text-[#FAF9F6]'
                   }`}
               >
                 {period}
@@ -481,8 +481,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     key={m}
                     onClick={() => setActivePlatformFilter(m)}
                     className={`px-2 py-0.5 rounded transition-all cursor-pointer ${activePlatformFilter === m
-                        ? 'bg-[#f2ca50]/20 text-[#f2ca50] border border-[#f2ca50]/30 font-bold'
-                        : 'text-[#99907c] hover:text-[#FAF9F6]'
+                      ? 'bg-[#f2ca50]/20 text-[#f2ca50] border border-[#f2ca50]/30 font-bold'
+                      : 'text-[#99907c] hover:text-[#FAF9F6]'
                       }`}
                   >
                     {m}
@@ -502,10 +502,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   <div className="w-full bg-[#2a2a2a] rounded-full h-2 overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-1000 ${item.shortName === 'Insta'
-                          ? 'bg-[#10B981]'
-                          : item.shortName === 'X'
-                            ? 'bg-[#f2ca50]'
-                            : 'bg-[#b4c5ff]'
+                        ? 'bg-[#10B981]'
+                        : item.shortName === 'X'
+                          ? 'bg-[#f2ca50]'
+                          : 'bg-[#b4c5ff]'
                         }`}
                       style={{ width: `${item.percentage}%` }}
                     />
@@ -554,8 +554,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 key={tab.key}
                 onClick={() => setStarCategoryFilter(tab.key)}
                 className={`px-3.5 py-1.5 text-xs font-mono tracking-wider rounded-xl transition-all cursor-pointer ${starCategoryFilter === tab.key
-                    ? 'bg-[#f2ca50] text-[#131313] font-bold shadow-md'
-                    : 'bg-[#1c1b1b] text-[#d0c5af] border border-[#4d4635]/30 hover:border-[#f2ca50]/40'
+                  ? 'bg-[#f2ca50] text-[#131313] font-bold shadow-md'
+                  : 'bg-[#1c1b1b] text-[#d0c5af] border border-[#4d4635]/30 hover:border-[#f2ca50]/40'
                   }`}
               >
                 {tab.label}
@@ -685,8 +685,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     <button
                       onClick={() => onToggleFollow(star.id)}
                       className={`p-2.5 rounded-xl border transition-all cursor-pointer ${isFollowing
-                          ? 'border-[#f2ca50] bg-[#f2ca50]/15 text-[#f2ca50]'
-                          : 'border-[#4d4635]/40 text-[#99907c] hover:text-[#FAF9F6] hover:border-[#f2ca50]/40'
+                        ? 'border-[#f2ca50] bg-[#f2ca50]/15 text-[#f2ca50]'
+                        : 'border-[#4d4635]/40 text-[#99907c] hover:text-[#FAF9F6] hover:border-[#f2ca50]/40'
                         }`}
                       title={isFollowing ? 'Tracking Star' : 'Follow Star'}
                       aria-label={isFollowing ? 'Tracking Star' : 'Follow Star'}
@@ -732,8 +732,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 key={tab.key}
                 onClick={() => setTmdbCategory(tab.key)}
                 className={`px-3.5 py-1.5 text-xs font-mono tracking-wider rounded-xl transition-all cursor-pointer ${tmdbCategory === tab.key
-                    ? 'bg-[#f2ca50] text-[#131313] font-bold shadow-md'
-                    : 'bg-[#1c1b1b] text-[#d0c5af] border border-[#4d4635]/30 hover:border-[#f2ca50]/40'
+                  ? 'bg-[#f2ca50] text-[#131313] font-bold shadow-md'
+                  : 'bg-[#1c1b1b] text-[#d0c5af] border border-[#4d4635]/30 hover:border-[#f2ca50]/40'
                   }`}
               >
                 {tab.label}
@@ -896,8 +896,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 key={cat}
                 onClick={() => setNewsCategoryFilter(cat)}
                 className={`px-3 py-1.5 text-xs font-mono tracking-wider rounded-xl transition-all cursor-pointer ${newsCategoryFilter === cat
-                    ? 'bg-[#f2ca50] text-[#131313] font-bold shadow-md'
-                    : 'bg-[#1c1b1b] text-[#d0c5af] border border-[#4d4635]/30 hover:border-[#f2ca50]/40'
+                  ? 'bg-[#f2ca50] text-[#131313] font-bold shadow-md'
+                  : 'bg-[#1c1b1b] text-[#d0c5af] border border-[#4d4635]/30 hover:border-[#f2ca50]/40'
                   }`}
               >
                 {cat}
@@ -1012,10 +1012,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <div className="w-full bg-[#2a2a2a] rounded-full h-2 overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-1000 ${reg.region === 'South'
-                      ? 'bg-[#10B981]'
-                      : reg.region === 'North'
-                        ? 'bg-[#f2ca50]'
-                        : 'bg-[#b4c5ff]'
+                    ? 'bg-[#10B981]'
+                    : reg.region === 'North'
+                      ? 'bg-[#f2ca50]'
+                      : 'bg-[#b4c5ff]'
                     }`}
                   style={{ width: `${reg.percentage}%` }}
                 />

@@ -36,7 +36,7 @@ const SkeletonPodiumCard: React.FC = () => (
       <div className="h-5 w-16 bg-[#2a2a2a] rounded-full" />
     </div>
     <div className="flex items-center gap-4 my-2">
-      <div className="w-16 h-16 rounded-2xl bg-[#2a2a2a]" />
+      <div className="w-16 h-16 rounded-2xl bg-[#2a2a2a] shrink-0" />
       <div className="space-y-2 flex-1">
         <div className="h-5 bg-[#2a2a2a] rounded w-2/3" />
         <div className="h-3 bg-[#2a2a2a] rounded w-1/3" />
@@ -104,7 +104,7 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
 
   return (
     <div id="trending-view-container" className="space-y-8 animate-fade-in pb-12">
-      {/* Header Layout (Tabs moved to rightmost) */}
+      {/* Header Layout (Responsive Tabs) */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="font-headline-xl text-3xl md:text-4xl text-[#FAF9F6] tracking-tight">
@@ -116,10 +116,10 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
         </div>
 
         {/* Rightmost Clean Tabs: People | Movies | TV */}
-        <div className="flex items-center bg-[#1c1b1b] p-1 rounded-xl border border-[#4d4635]/30 self-start md:self-auto ml-auto">
+        <div className="flex items-center bg-[#1c1b1b] p-1 rounded-xl border border-[#4d4635]/30 self-start md:self-auto w-full sm:w-auto">
           <button
             onClick={() => setActiveTab('people')}
-            className={`px-4 py-2 text-xs font-mono rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+            className={`flex-1 sm:flex-initial px-4 py-2 text-xs font-mono rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'people'
                 ? 'bg-[#f2ca50] text-[#131313] font-bold shadow-md'
                 : 'text-[#d0c5af] hover:text-[#FAF9F6]'
@@ -131,7 +131,7 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
 
           <button
             onClick={() => setActiveTab('movies')}
-            className={`px-4 py-2 text-xs font-mono rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+            className={`flex-1 sm:flex-initial px-4 py-2 text-xs font-mono rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'movies'
                 ? 'bg-[#f2ca50] text-[#131313] font-bold shadow-md'
                 : 'text-[#d0c5af] hover:text-[#FAF9F6]'
@@ -143,7 +143,7 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
 
           <button
             onClick={() => setActiveTab('tv')}
-            className={`px-4 py-2 text-xs font-mono rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+            className={`flex-1 sm:flex-initial px-4 py-2 text-xs font-mono rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'tv'
                 ? 'bg-[#f2ca50] text-[#131313] font-bold shadow-md'
                 : 'text-[#d0c5af] hover:text-[#FAF9F6]'
@@ -166,7 +166,7 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
                   <SkeletonPodiumCard key={n} />
                 ))}
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {[1, 2, 3, 4].map((n) => (
                   <SkeletonTrendingCard key={n} />
                 ))}
@@ -183,11 +183,11 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
                       <div
                         key={person.id}
                         onClick={() => onSelectStar(person.id.toString())}
-                        className="bg-[#1c1b1b] border border-[#f2ca50]/30 hover:border-[#f2ca50] rounded-2xl p-6 relative overflow-hidden group transition-all flex flex-col justify-between shadow-xl cursor-pointer"
+                        className="bg-[#1c1b1b] border border-[#f2ca50]/30 hover:border-[#f2ca50] rounded-2xl p-5 sm:p-6 relative overflow-hidden group transition-all flex flex-col justify-between shadow-xl cursor-pointer"
                       >
                         <div className="absolute top-0 right-0 w-24 h-24 bg-[#f2ca50]/10 rounded-bl-full blur-xl" />
-                        <div className="flex justify-between items-start mb-4">
-                          <span className="font-mono text-3xl font-bold text-[#f2ca50]">#{idx + 1}</span>
+                        <div className="flex justify-between items-start mb-3 sm:mb-4">
+                          <span className="font-mono text-2xl sm:text-3xl font-bold text-[#f2ca50]">#{idx + 1}</span>
                           <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-[#10B981]/20 text-[#10B981] border border-[#10B981]/30 font-bold uppercase">
                             ★ {person.popularity ? person.popularity.toFixed(0) : 'N/A'}
                           </span>
@@ -197,17 +197,17 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
                           <img
                             src={getTMDBImageUrl(person.profile_path, 'w185', 'profile')}
                             alt={person.name}
-                            className="w-16 h-16 rounded-2xl object-cover border-2 border-[#f2ca50]/40 group-hover:border-[#f2ca50] transition-colors shadow-md"
+                            className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover border-2 border-[#f2ca50]/40 group-hover:border-[#f2ca50] transition-colors shadow-md shrink-0 aspect-square"
                             referrerPolicy="no-referrer"
                             onError={(e) => {
                               (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80';
                             }}
                           />
                           <div>
-                            <h3 className="font-headline-md text-xl text-[#FAF9F6] group-hover:text-[#f2ca50] transition-colors">
+                            <h3 className="font-headline-md text-lg sm:text-xl text-[#FAF9F6] group-hover:text-[#f2ca50] transition-colors leading-tight line-clamp-1">
                               {person.name}
                             </h3>
-                            <p className="text-xs text-[#99907c] font-mono">{person.known_for_department || 'Acting'}</p>
+                            <p className="text-xs text-[#99907c] font-mono mt-0.5">{person.known_for_department || 'Acting'}</p>
                           </div>
                         </div>
 
@@ -227,9 +227,9 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
                                   : 'bg-[#2a2a2a] hover:bg-[#f2ca50] text-[#FAF9F6] hover:text-[#131313] border-[#4d4635]/40'
                               }`}
                             >
-                                <span className="material-symbols-outlined text-[15px]">
-                                  {isFollowed ? 'person_remove' : 'person_add'}
-                                </span>
+                              <span className="material-symbols-outlined text-[15px]">
+                                {isFollowed ? 'person_remove' : 'person_add'}
+                              </span>
                               <span>{isFollowed ? 'Following' : 'Follow'}</span>
                             </button>
                           )}
@@ -240,8 +240,8 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
                 </div>
               )}
 
-              {/* Full TMDB Live Table for People (Removed Known For & Replaced Actions with Follow) */}
-              <div className="bg-[#1c1b1b] border border-[#4d4635]/30 rounded-2xl p-6 overflow-x-auto shadow-xl">
+              {/* Full TMDB Live Table for People */}
+              <div className="bg-[#1c1b1b] border border-[#4d4635]/30 rounded-2xl p-4 sm:p-6 overflow-x-auto shadow-xl">
                 <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#4d4635]/30">
                   <span className="text-xs font-mono text-[#d0c5af] uppercase tracking-wider font-bold">
                     Trending People (Sorted by Popularity)
@@ -251,14 +251,14 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
                   </span>
                 </div>
 
-                <table className="w-full text-left text-xs font-mono">
+                <table className="w-full text-left text-xs font-mono min-w-[500px]">
                   <thead>
                     <tr className="border-b border-[#4d4635]/30 text-[#99907c] uppercase tracking-wider">
-                      <th className="pb-3 pl-2">Rank</th>
-                      <th className="pb-3">Person Profile</th>
-                      <th className="pb-3">Department</th>
-                      <th className="pb-3">TMDB Popularity</th>
-                      <th className="pb-3 text-right pr-2">Follow</th>
+                      <th className="pb-3 pl-2 whitespace-nowrap">Rank</th>
+                      <th className="pb-3 whitespace-nowrap">Person Profile</th>
+                      <th className="pb-3 whitespace-nowrap">Department</th>
+                      <th className="pb-3 whitespace-nowrap">TMDB Popularity</th>
+                      <th className="pb-3 text-right pr-2 whitespace-nowrap">Follow</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#4d4635]/15">
@@ -276,14 +276,14 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
                               <img
                                 src={getTMDBImageUrl(person.profile_path, 'w185', 'profile')}
                                 alt={person.name}
-                                className="w-10 h-10 rounded-xl object-cover border border-[#4d4635]/40 group-hover:border-[#f2ca50] transition-colors"
+                                className="w-10 h-10 rounded-xl object-cover border border-[#4d4635]/40 group-hover:border-[#f2ca50] transition-colors shrink-0 aspect-square"
                                 referrerPolicy="no-referrer"
                                 onError={(e) => {
                                   (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80';
                                 }}
                               />
                               <div>
-                                <span className="font-headline-sm text-sm text-[#FAF9F6] group-hover:text-[#f2ca50] transition-colors block">
+                                <span className="font-headline-sm text-sm text-[#FAF9F6] group-hover:text-[#f2ca50] transition-colors block leading-tight">
                                   {person.name}
                                 </span>
                                 <span className="text-[10px] text-[#99907c]">
@@ -296,7 +296,7 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
                             {person.known_for_department || 'Acting'}
                           </td>
                           <td className="py-4">
-                            <span className="px-2.5 py-1 rounded-md bg-[#f2ca50]/15 text-[#f2ca50] font-bold border border-[#f2ca50]/30">
+                            <span className="px-2.5 py-1 rounded-md bg-[#f2ca50]/15 text-[#f2ca50] font-bold border border-[#f2ca50]/30 whitespace-nowrap">
                               ★ {person.popularity?.toFixed(1)}
                             </span>
                           </td>
@@ -307,7 +307,7 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
                                   e.stopPropagation();
                                   onToggleFollow(`tmdb-${person.id}`, e);
                                 }}
-                                className={`px-4 py-1.5 rounded-xl border transition-all font-bold text-xs cursor-pointer flex items-center gap-1 ml-auto ${
+                                className={`px-3 sm:px-4 py-1.5 rounded-xl border transition-all font-bold text-xs cursor-pointer flex items-center gap-1 ml-auto ${
                                   isFollowed
                                     ? 'bg-[#f2ca50]/15 text-[#f2ca50] border-[#f2ca50]'
                                     : 'bg-[#2a2a2a] hover:bg-[#f2ca50] text-[#FAF9F6] hover:text-[#131313] border-[#4d4635]/40'
@@ -340,13 +340,13 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
                 <SkeletonTrendingCard key={n} />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {trendingMovies.map((movie, idx) => (
                 <div
                   key={movie.id}
@@ -410,13 +410,13 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
                 <SkeletonTrendingCard key={n} />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {trendingTV.map((show, idx) => (
                 <div
                   key={show.id}

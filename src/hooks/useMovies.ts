@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { TMDBMovie, TMDBPerson } from '../types';
 import {
-  fetchIndianCinema,
-  fetchTrendingMovies,
-  fetchNowPlaying,
+  fetchPopularMovies,
+  fetchTopRatedMovies,
   fetchUpcoming,
   fetchPopularPeople,
 } from '../services/tmdbService';
 
-export function useMovies(category: 'indian' | 'trending' | 'now_playing' | 'upcoming' = 'indian') {
+export function useMovies(category: 'popular' | 'top_rated' | 'upcoming' = 'popular', page = 1) {
   const [movies, setMovies] = useState<TMDBMovie[]>([]);
   const [people, setPeople] = useState<TMDBPerson[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -19,17 +18,14 @@ export function useMovies(category: 'indian' | 'trending' | 'now_playing' | 'upc
       setLoading(true);
       try {
         let resMovies: TMDBMovie[] = [];
-        if (category === 'indian') {
-          const res = await fetchIndianCinema(1, 'popularity.desc', 'hi|ta|te|ml|kn');
+        if (category === 'popular') {
+          const res = await fetchPopularMovies(page);
           resMovies = res.results || [];
-        } else if (category === 'trending') {
-          const res = await fetchTrendingMovies('week', 1);
-          resMovies = res.results || [];
-        } else if (category === 'now_playing') {
-          const res = await fetchNowPlaying(1);
+        } else if (category === 'top_rated') {
+          const res = await fetchTopRatedMovies(page);
           resMovies = res.results || [];
         } else if (category === 'upcoming') {
-          const res = await fetchUpcoming(1);
+          const res = await fetchUpcoming(page);
           resMovies = res.results || [];
         }
 
@@ -53,7 +49,7 @@ export function useMovies(category: 'indian' | 'trending' | 'now_playing' | 'upc
     return () => {
       isMounted = false;
     };
-  }, [category]);
+  }, [category, page]);
 
   return {
     movies,

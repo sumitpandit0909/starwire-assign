@@ -127,6 +127,28 @@ export async function fetchTrendingMovies(timeWindowOrPage: 'day' | 'week' | num
   }
 }
 
+export async function fetchPopularMovies(page = 1): Promise<{ results: TMDBMovie[]; total_results: number }> {
+  try {
+    const res = await fetch(`/api/tmdb/popular-movies?page=${page}`);
+    if (!res.ok) throw new Error('Failed to fetch popular movies');
+    return await res.json();
+  } catch (e) {
+    console.warn('TMDB fetch error:', e);
+    return { results: [], total_results: 0 };
+  }
+}
+
+export async function fetchTopRatedMovies(page = 1): Promise<{ results: TMDBMovie[]; total_results: number }> {
+  try {
+    const res = await fetch(`/api/tmdb/top-rated-movies?page=${page}`);
+    if (!res.ok) throw new Error('Failed to fetch top rated movies');
+    return await res.json();
+  } catch (e) {
+    console.warn('TMDB fetch error:', e);
+    return { results: [], total_results: 0 };
+  }
+}
+
 export async function fetchIndianCinema(page = 1, sortBy = 'popularity.desc', language = 'hi|ta|te|ml|kn'): Promise<{ results: TMDBMovie[]; total_results: number }> {
   try {
     const res = await fetch(`/api/tmdb/indian-cinema?page=${page}&sortBy=${sortBy}&language=${language}`);

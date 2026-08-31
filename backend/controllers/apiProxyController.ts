@@ -358,6 +358,26 @@ export async function getTrendingTV(req: Request, res: Response) {
   }
 }
 
+export async function getPopularMovies(req: Request, res: Response) {
+  try {
+    const page = (req.query.page as string) || '1';
+    const data = await fetchTMDB('/movie/popular', { page });
+    res.json(data);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+export async function getTopRatedMovies(req: Request, res: Response) {
+  try {
+    const page = (req.query.page as string) || '1';
+    const data = await fetchTMDB('/movie/top_rated', { page });
+    res.json(data);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 export async function getIndianCinema(req: Request, res: Response) {
   try {
     const page = (req.query.page as string) || '1';

@@ -22,6 +22,7 @@ import { ExploreStarsView } from './components/ExploreStars/ExploreStarsView';
 import { StarDetailsView } from './components/StarDetails/StarDetailsView';
 import { RequestAccessView } from './components/Auth/RequestAccessView';
 import { WatchlistView } from './components/Watchlist/WatchlistView';
+import { FollowingView } from './components/Following/FollowingView';
 import { TrendingView } from './components/Trending/TrendingView';
 import { MoviesView } from './components/Movies/MoviesView';
 import { MovieDetailsView } from './components/MovieDetails/MovieDetailsView';
@@ -226,14 +227,8 @@ const MainLayout: React.FC<{
                   onViewTrending={() => navigate('/trending')}
                   onViewAllMovies={() => navigate('/movies')}
                   onViewAllNews={() => navigate('/news')}
-                  onOpenFollowing={() => {
-                    setWatchlistSubTab('following');
-                    navigate('/watchlist');
-                  }}
-                  onOpenWatchlist={() => {
-                    setWatchlistSubTab('watchlist');
-                    navigate('/watchlist');
-                  }}
+                  onOpenFollowing={() => navigate('/following')}
+                  onOpenWatchlist={() => navigate('/watchlist')}
                   onOpenIntelligence={openIntelligenceModal}
                   onToggleFollow={toggleFollowStar}
                   followingIds={followingIds}
@@ -271,21 +266,29 @@ const MainLayout: React.FC<{
             />
 
             <Route
-              path="/watchlist"
+              path="/following"
               element={
-                <WatchlistView
-                  followingStars={followingStarsList}
-                  watchlistNews={watchlistNewsList}
+                <FollowingView
+                  followingIds={followingIds}
+                  stars={stars}
                   onSelectStar={(id) => {
                     selectStar(id);
                     navigate(`/star/${id}`);
                   }}
+                  onToggleFollow={toggleFollowStar}
+                  onOpenIntelligence={openIntelligenceModal}
+                />
+              }
+            />
+
+            <Route
+              path="/watchlist"
+              element={
+                <WatchlistView
+                  watchlistNews={watchlistNewsList}
                   onSelectNews={(id) => openNewsModal(id)}
-                  onUnfollowStar={toggleFollowStar}
                   onRemoveBookmark={toggleBookmarkNews}
-                  onExploreStars={() => navigate('/explore')}
-                  activeSubTab={watchlistSubTab}
-                  setActiveSubTab={setWatchlistSubTab}
+                  onOpenIntelligence={openIntelligenceModal}
                 />
               }
             />

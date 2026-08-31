@@ -29,7 +29,8 @@ export const SideNav: React.FC<SideNavProps> = ({
     { path: '/explore', label: 'Explore Stars', icon: 'star' },
     { path: '/trending', label: 'Trending', icon: 'trending_up' },
     { path: '/movies', label: 'Movies & TMDB', icon: 'movie' },
-    { path: '/watchlist', label: 'Watchlist & Following', icon: 'bookmark' },
+    { path: '/following', label: 'Following', icon: 'group' },
+    { path: '/watchlist', label: 'Watchlist', icon: 'bookmark' },
     { path: '/news', label: 'News Wire', icon: 'newspaper' },
   ];
 

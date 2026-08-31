@@ -10,6 +10,8 @@ import {
 interface TrendingViewProps {
   stars?: Star[];
   onSelectStar: (starId: string) => void;
+  followingIds?: string[];
+  onToggleFollow?: (starId: string, e?: React.MouseEvent) => void;
   onOpenIntelligence: (starName?: string) => void;
 }
 
@@ -45,6 +47,8 @@ const SkeletonPodiumCard: React.FC = () => (
 
 export const TrendingView: React.FC<TrendingViewProps> = ({
   onSelectStar,
+  followingIds = [],
+  onToggleFollow,
   onOpenIntelligence,
 }) => {
   const [activeTab, setActiveTab] = useState<'people' | 'movies' | 'tv'>('people');
@@ -171,63 +175,70 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
               {/* Top 3 Live Talent Podium */}
               {trendingPeople.length >= 3 && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {trendingPeople.slice(0, 3).map((person, idx) => (
-                    <div
-                      key={person.id}
-                      onClick={() => onSelectStar(person.id.toString())}
-                      className="bg-[#1c1b1b] border border-[#f2ca50]/30 hover:border-[#f2ca50] rounded-2xl p-6 relative overflow-hidden group transition-all flex flex-col justify-between shadow-xl cursor-pointer"
-                    >
-                      <div className="absolute top-0 right-0 w-24 h-24 bg-[#f2ca50]/10 rounded-bl-full blur-xl" />
-                      <div className="flex justify-between items-start mb-4">
-                        <span className="font-mono text-3xl font-bold text-[#f2ca50]">#{idx + 1}</span>
-                        <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-[#10B981]/20 text-[#10B981] border border-[#10B981]/30 font-bold uppercase">
-                          ★ {person.popularity ? person.popularity.toFixed(0) : 'N/A'}
-                        </span>
-                      </div>
+                  {trendingPeople.slice(0, 3).map((person, idx) => {
+                    const isFollowed = followingIds.includes(`tmdb-${person.id}`) || followingIds.includes(person.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
+                    return (
+                      <div
+                        key={person.id}
+                        onClick={() => onSelectStar(person.id.toString())}
+                        className="bg-[#1c1b1b] border border-[#f2ca50]/30 hover:border-[#f2ca50] rounded-2xl p-6 relative overflow-hidden group transition-all flex flex-col justify-between shadow-xl cursor-pointer"
+                      >
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-[#f2ca50]/10 rounded-bl-full blur-xl" />
+                        <div className="flex justify-between items-start mb-4">
+                          <span className="font-mono text-3xl font-bold text-[#f2ca50]">#{idx + 1}</span>
+                          <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-[#10B981]/20 text-[#10B981] border border-[#10B981]/30 font-bold uppercase">
+                            ★ {person.popularity ? person.popularity.toFixed(0) : 'N/A'}
+                          </span>
+                        </div>
 
-                      <div className="flex items-center gap-4 my-2">
-                        <img
-                          src={getTMDBImageUrl(person.profile_path, 'w185', 'profile')}
-                          alt={person.name}
-                          className="w-16 h-16 rounded-2xl object-cover border-2 border-[#f2ca50]/40 group-hover:border-[#f2ca50] transition-colors shadow-md"
-                          referrerPolicy="no-referrer"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80';
-                          }}
-                        />
-                        <div>
-                          <h3 className="font-headline-md text-xl text-[#FAF9F6] group-hover:text-[#f2ca50] transition-colors">
-                            {person.name}
-                          </h3>
-                          <p className="text-xs text-[#99907c] font-mono">{person.known_for_department || 'Acting'}</p>
+                        <div className="flex items-center gap-4 my-2">
+                          <img
+                            src={getTMDBImageUrl(person.profile_path, 'w185', 'profile')}
+                            alt={person.name}
+                            className="w-16 h-16 rounded-2xl object-cover border-2 border-[#f2ca50]/40 group-hover:border-[#f2ca50] transition-colors shadow-md"
+                            referrerPolicy="no-referrer"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80';
+                            }}
+                          />
+                          <div>
+                            <h3 className="font-headline-md text-xl text-[#FAF9F6] group-hover:text-[#f2ca50] transition-colors">
+                              {person.name}
+                            </h3>
+                            <p className="text-xs text-[#99907c] font-mono">{person.known_for_department || 'Acting'}</p>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 pt-4 border-t border-[#4d4635]/25 flex justify-between items-center">
+                          <span className="text-xs font-mono text-[#f2ca50] font-bold">
+                            View Profile ↗
+                          </span>
+                          {onToggleFollow && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onToggleFollow(`tmdb-${person.id}`, e);
+                              }}
+                              className={`px-3 py-1.5 rounded-xl border transition-all font-bold text-xs cursor-pointer flex items-center gap-1 ${
+                                isFollowed
+                                  ? 'bg-[#f2ca50]/15 text-[#f2ca50] border-[#f2ca50]'
+                                  : 'bg-[#2a2a2a] hover:bg-[#f2ca50] text-[#FAF9F6] hover:text-[#131313] border-[#4d4635]/40'
+                              }`}
+                            >
+                              <span className="material-symbols-outlined text-[14px]">
+                                {isFollowed ? 'bookmark_added' : 'bookmark_add'}
+                              </span>
+                              <span>{isFollowed ? 'Following' : 'Follow'}</span>
+                            </button>
+                          )}
                         </div>
                       </div>
-
-                      <div className="mt-3 text-xs text-[#d0c5af] font-light line-clamp-1">
-                        Known for: <strong className="text-[#FAF9F6] font-normal">{person.known_for?.map(k => k.title || k.name).join(', ') || 'Feature Films'}</strong>
-                      </div>
-
-                      <div className="mt-4 pt-4 border-t border-[#4d4635]/25 flex justify-between items-center">
-                        <span className="text-xs font-mono text-[#f2ca50] font-bold">
-                          View Profile ↗
-                        </span>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onOpenIntelligence(person.name);
-                          }}
-                          className="text-xs font-mono text-[#d0c5af] hover:text-[#f2ca50] flex items-center gap-1 cursor-pointer"
-                        >
-                          <span>AI Intel</span>
-                          <span className="material-symbols-outlined text-[14px]">auto_awesome</span>
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
 
-              {/* Full TMDB Live Table for People (Sorted by Popularity) */}
+              {/* Full TMDB Live Table for People (Removed Known For & Replaced Actions with Follow) */}
               <div className="bg-[#1c1b1b] border border-[#4d4635]/30 rounded-2xl p-6 overflow-x-auto shadow-xl">
                 <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#4d4635]/30">
                   <span className="text-xs font-mono text-[#d0c5af] uppercase tracking-wider font-bold">
@@ -244,64 +255,72 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
                       <th className="pb-3 pl-2">Rank</th>
                       <th className="pb-3">Person Profile</th>
                       <th className="pb-3">Department</th>
-                      <th className="pb-3">Known For Works</th>
                       <th className="pb-3">TMDB Popularity</th>
-                      <th className="pb-3 text-right pr-2">Actions</th>
+                      <th className="pb-3 text-right pr-2">Follow</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#4d4635]/15">
-                    {trendingPeople.map((person, i) => (
-                      <tr
-                        key={person.id}
-                        onClick={() => onSelectStar(person.id.toString())}
-                        className="hover:bg-[#201f1f] transition-colors cursor-pointer group"
-                      >
-                        <td className="py-4 pl-2 font-bold text-[#f2ca50]">#{i + 1}</td>
-                        <td className="py-4">
-                          <div className="flex items-center gap-3">
-                            <img
-                              src={getTMDBImageUrl(person.profile_path, 'w185', 'profile')}
-                              alt={person.name}
-                              className="w-10 h-10 rounded-xl object-cover border border-[#4d4635]/40 group-hover:border-[#f2ca50] transition-colors"
-                              referrerPolicy="no-referrer"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80';
-                              }}
-                            />
-                            <div>
-                              <span className="font-headline-sm text-sm text-[#FAF9F6] group-hover:text-[#f2ca50] transition-colors block">
-                                {person.name}
-                              </span>
-                              <span className="text-[10px] text-[#99907c]">
-                                TMDB ID #{person.id}
-                              </span>
+                    {trendingPeople.map((person, i) => {
+                      const isFollowed = followingIds.includes(`tmdb-${person.id}`) || followingIds.includes(person.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
+                      return (
+                        <tr
+                          key={person.id}
+                          onClick={() => onSelectStar(person.id.toString())}
+                          className="hover:bg-[#201f1f] transition-colors cursor-pointer group"
+                        >
+                          <td className="py-4 pl-2 font-bold text-[#f2ca50]">#{i + 1}</td>
+                          <td className="py-4">
+                            <div className="flex items-center gap-3">
+                              <img
+                                src={getTMDBImageUrl(person.profile_path, 'w185', 'profile')}
+                                alt={person.name}
+                                className="w-10 h-10 rounded-xl object-cover border border-[#4d4635]/40 group-hover:border-[#f2ca50] transition-colors"
+                                referrerPolicy="no-referrer"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80';
+                                }}
+                              />
+                              <div>
+                                <span className="font-headline-sm text-sm text-[#FAF9F6] group-hover:text-[#f2ca50] transition-colors block">
+                                  {person.name}
+                                </span>
+                                <span className="text-[10px] text-[#99907c]">
+                                  TMDB ID #{person.id}
+                                </span>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className="py-4 text-[#d0c5af]">
-                          {person.known_for_department || 'Acting'}
-                        </td>
-                        <td className="py-4 text-[#d0c5af] max-w-xs truncate">
-                          {person.known_for?.map(k => k.title || k.name).join(', ') || 'N/A'}
-                        </td>
-                        <td className="py-4">
-                          <span className="px-2.5 py-1 rounded-md bg-[#f2ca50]/15 text-[#f2ca50] font-bold border border-[#f2ca50]/30">
-                            ★ {person.popularity?.toFixed(1)}
-                          </span>
-                        </td>
-                        <td className="py-4 text-right pr-2">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onOpenIntelligence(person.name);
-                            }}
-                            className="px-3 py-1.5 rounded-lg bg-[#2a2a2a] hover:bg-[#f2ca50] text-[#FAF9F6] hover:text-[#131313] transition-all font-bold cursor-pointer"
-                          >
-                            AI Intel
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
+                          </td>
+                          <td className="py-4 text-[#d0c5af]">
+                            {person.known_for_department || 'Acting'}
+                          </td>
+                          <td className="py-4">
+                            <span className="px-2.5 py-1 rounded-md bg-[#f2ca50]/15 text-[#f2ca50] font-bold border border-[#f2ca50]/30">
+                              ★ {person.popularity?.toFixed(1)}
+                            </span>
+                          </td>
+                          <td className="py-4 text-right pr-2">
+                            {onToggleFollow && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onToggleFollow(`tmdb-${person.id}`, e);
+                                }}
+                                className={`px-4 py-1.5 rounded-xl border transition-all font-bold text-xs cursor-pointer flex items-center gap-1 ml-auto ${
+                                  isFollowed
+                                    ? 'bg-[#f2ca50]/15 text-[#f2ca50] border-[#f2ca50]'
+                                    : 'bg-[#2a2a2a] hover:bg-[#f2ca50] text-[#FAF9F6] hover:text-[#131313] border-[#4d4635]/40'
+                                }`}
+                              >
+                                <span className="material-symbols-outlined text-[15px]">
+                                  {isFollowed ? 'bookmark_added' : 'bookmark_add'}
+                                </span>
+                                <span>{isFollowed ? 'Following' : 'Follow'}</span>
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

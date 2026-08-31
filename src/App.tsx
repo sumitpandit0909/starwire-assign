@@ -290,6 +290,8 @@ const MainLayout: React.FC<{
                     selectStar(id);
                     navigate(`/star/${id}`);
                   }}
+                  followingIds={followingIds}
+                  onToggleFollow={toggleFollowStar}
                   onOpenIntelligence={openIntelligenceModal}
                 />
               }

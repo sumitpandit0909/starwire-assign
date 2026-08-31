@@ -456,6 +456,24 @@ export function AppContent() {
     loadLiveData();
   }, [initializeAuth, loadLiveData]);
 
+  // Sync document root theme attributes when isDarkMode changes
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDarkMode) {
+      root.classList.remove('light');
+      root.classList.add('dark');
+      root.setAttribute('data-theme', 'dark');
+      document.body.classList.remove('light');
+      document.body.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+      root.classList.add('light');
+      root.setAttribute('data-theme', 'light');
+      document.body.classList.remove('dark');
+      document.body.classList.add('light');
+    }
+  }, [isDarkMode]);
+
   const handleLogout = () => {
     logout();
     showToast('Signed out of session.');

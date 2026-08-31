@@ -58,7 +58,7 @@ export const SideNav: React.FC<SideNavProps> = ({
 
       <nav
         id="main-sidebar"
-        className={`fixed left-0 top-0 h-full border-r border-[#4d4635]/20 bg-[#131313] flex flex-col py-6 z-50 transition-all duration-300 ${
+        className={`fixed left-0 top-0 h-full border-r border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-primary)] flex flex-col py-6 z-50 transition-all duration-300 ${
           isCollapsed ? 'w-64 md:w-20 px-4 md:px-3' : 'w-64 px-5'
         } ${isOpenMobile ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >

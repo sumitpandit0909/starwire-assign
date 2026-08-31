@@ -36,14 +36,41 @@ interface DataState {
   setMobileNavOpen: (isOpen: boolean) => void;
 }
 
+const CACHE_NEWS_KEY = 'starwire_cache_news';
+const CACHE_STARS_KEY = 'starwire_cache_stars';
+const CACHE_REGIONAL_KEY = 'starwire_cache_regional';
+const CACHE_BUZZ_KEY = 'starwire_cache_buzz';
+
+const getCachedItems = <T>(key: string, fallback: T): T => {
+  try {
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : fallback;
+  } catch (e) {
+    return fallback;
+  }
+};
+
+const setCachedItems = (key: string, data: any) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (e) {
+    console.error(`Failed to cache ${key} in localStorage:`, e);
+  }
+};
+
+const initialStars = getCachedItems<Star[]>(CACHE_STARS_KEY, []);
+const initialNews = getCachedItems<NewsBrief[]>(CACHE_NEWS_KEY, []);
+const initialRegional = getCachedItems<RegionalPerformance[]>(CACHE_REGIONAL_KEY, []);
+const initialBuzz = getCachedItems<PlatformBuzz[]>(CACHE_BUZZ_KEY, []);
+
 export const useDataStore = create<DataState>((set, get) => ({
   currentTab: 'landing',
-  selectedStarId: '',
-  stars: [],
-  news: [],
-  regionalStats: [],
-  platformBuzz: [],
-  loadingData: true,
+  selectedStarId: initialStars.length > 0 ? initialStars[0].id : '',
+  stars: initialStars,
+  news: initialNews,
+  regionalStats: initialRegional,
+  platformBuzz: initialBuzz,
+  loadingData: initialStars.length === 0,
 
   isDarkMode: (() => {
     const saved = localStorage.getItem('starwire-theme');
@@ -73,7 +100,10 @@ export const useDataStore = create<DataState>((set, get) => ({
   },
 
   loadLiveData: async () => {
-    set({ loadingData: true });
+    // If we have cached data, don't flip loadingData to true to prevent UI flash
+    if (get().stars.length === 0) {
+      set({ loadingData: true });
+    }
     try {
       const [newsRes, starsRes, marketRes] = await Promise.all([
         fetchLiveNews('ALL', '', 1),
@@ -81,13 +111,24 @@ export const useDataStore = create<DataState>((set, get) => ({
         fetchMarketPulse(),
       ]);
 
+      const fetchedNews = newsRes.articles || [];
+      const fetchedStars = starsRes || [];
+      const fetchedRegional = marketRes?.regionalStats || [];
+      const fetchedBuzz = marketRes?.platformBuzz || [];
+
       set({
-        news: newsRes.articles || [],
-        stars: starsRes || [],
-        selectedStarId: starsRes && starsRes.length > 0 ? starsRes[0].id : '',
-        regionalStats: marketRes?.regionalStats || [],
-        platformBuzz: marketRes?.platformBuzz || [],
+        news: fetchedNews,
+        stars: fetchedStars,
+        selectedStarId: get().selectedStarId || (fetchedStars.length > 0 ? fetchedStars[0].id : ''),
+        regionalStats: fetchedRegional,
+        platformBuzz: fetchedBuzz,
       });
+
+      // Write to persistent localStorage cache
+      setCachedItems(CACHE_NEWS_KEY, fetchedNews);
+      setCachedItems(CACHE_STARS_KEY, fetchedStars);
+      setCachedItems(CACHE_REGIONAL_KEY, fetchedRegional);
+      setCachedItems(CACHE_BUZZ_KEY, fetchedBuzz);
     } catch (err) {
       console.error('Error loading live data:', err);
     } finally {

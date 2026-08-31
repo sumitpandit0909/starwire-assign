@@ -414,7 +414,22 @@ export async function getNowPlaying(req: Request, res: Response) {
 export async function getUpcoming(req: Request, res: Response) {
   try {
     const page = (req.query.page as string) || '1';
-    const data = await fetchTMDB('/movie/upcoming', { page });
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    // Query discover endpoint with primary_release_date.gte = today
+    const data = await fetchTMDB('/discover/movie', {
+      page,
+      sort_by: 'popularity.desc',
+      'primary_release_date.gte': todayStr,
+    });
+
+    if (data && Array.isArray(data.results)) {
+      data.results = data.results.filter((m: any) => {
+        if (!m.release_date) return true;
+        return m.release_date >= todayStr;
+      });
+    }
+
     res.json(data);
   } catch (error: any) {
     res.status(500).json({ error: error.message });

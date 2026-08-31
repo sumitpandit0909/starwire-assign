@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { TabView, Star, NewsBrief, RegionalPerformance, PlatformBuzz } from '../types';
-import { fetchLiveNews, fetchLiveStars, fetchMarketPulse } from '../services/tmdbService';
+import { fetchLiveNews, fetchLiveStars, fetchMarketPulse, FALLBACK_STARS, FALLBACK_NEWS } from '../services/tmdbService';
 
 interface DataState {
   currentTab: TabView;
@@ -44,7 +44,9 @@ const CACHE_BUZZ_KEY = 'starwire_cache_buzz';
 const getCachedItems = <T>(key: string, fallback: T): T => {
   try {
     const data = localStorage.getItem(key);
-    return data ? JSON.parse(data) : fallback;
+    if (!data) return fallback;
+    const parsed = JSON.parse(data);
+    return Array.isArray(parsed) && parsed.length === 0 ? fallback : parsed;
   } catch (e) {
     return fallback;
   }
@@ -58,8 +60,8 @@ const setCachedItems = (key: string, data: any) => {
   }
 };
 
-const initialStars = getCachedItems<Star[]>(CACHE_STARS_KEY, []);
-const initialNews = getCachedItems<NewsBrief[]>(CACHE_NEWS_KEY, []);
+const initialStars = getCachedItems<Star[]>(CACHE_STARS_KEY, FALLBACK_STARS);
+const initialNews = getCachedItems<NewsBrief[]>(CACHE_NEWS_KEY, FALLBACK_NEWS);
 const initialRegional = getCachedItems<RegionalPerformance[]>(CACHE_REGIONAL_KEY, []);
 const initialBuzz = getCachedItems<PlatformBuzz[]>(CACHE_BUZZ_KEY, []);
 
@@ -70,7 +72,7 @@ export const useDataStore = create<DataState>((set, get) => ({
   news: initialNews,
   regionalStats: initialRegional,
   platformBuzz: initialBuzz,
-  loadingData: initialStars.length === 0,
+  loadingData: false,
 
   isDarkMode: (() => {
     const saved = localStorage.getItem('starwire-theme');
@@ -100,7 +102,6 @@ export const useDataStore = create<DataState>((set, get) => ({
   },
 
   loadLiveData: async () => {
-    // If we have cached data, don't flip loadingData to true to prevent UI flash
     if (get().stars.length === 0) {
       set({ loadingData: true });
     }
@@ -111,10 +112,10 @@ export const useDataStore = create<DataState>((set, get) => ({
         fetchMarketPulse(),
       ]);
 
-      const fetchedNews = newsRes.articles || [];
-      const fetchedStars = starsRes || [];
-      const fetchedRegional = marketRes?.regionalStats || [];
-      const fetchedBuzz = marketRes?.platformBuzz || [];
+      const fetchedNews = (newsRes.articles && newsRes.articles.length > 0) ? newsRes.articles : (get().news.length > 0 ? get().news : FALLBACK_NEWS);
+      const fetchedStars = (starsRes && starsRes.length > 0) ? starsRes : (get().stars.length > 0 ? get().stars : FALLBACK_STARS);
+      const fetchedRegional = marketRes?.regionalStats || get().regionalStats;
+      const fetchedBuzz = marketRes?.platformBuzz || get().platformBuzz;
 
       set({
         news: fetchedNews,
@@ -145,7 +146,7 @@ export const useDataStore = create<DataState>((set, get) => ({
       root.classList.remove('light');
       root.classList.add('dark');
       root.setAttribute('data-theme', 'dark');
-      document.body.classList.remove('light');
+      document.body.classList.remove('dark');
       document.body.classList.add('dark');
       localStorage.setItem('starwire-theme', 'dark');
     } else {

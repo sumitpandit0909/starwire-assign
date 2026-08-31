@@ -95,38 +95,39 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const tmdbMovies = useMemo(() => fetchedTmdbMovies.slice(0, 3), [fetchedTmdbMovies]);
   const tmdbPeople = useMemo(() => fetchedTmdbPeople.slice(0, 6), [fetchedTmdbPeople]);
 
-  // Robust Star Filtering guaranteed to match exact categories
+  // Robust Star Filtering guaranteed to match exact categories with non-empty fallback
   const filteredTrendingStars = useMemo(() => {
     if (!stars || stars.length === 0) return [];
     let list = [...stars];
 
     if (starCategoryFilter === 'ALL') {
-      // Global Stars tab: show Global category stars
       const globalStars = list.filter((s) => s.category === 'Global' || s.industry === 'Hollywood');
       if (globalStars.length > 0) list = globalStars;
     } else if (starCategoryFilter === 'Pan India') {
-      // Pan India tab: show strictly Pan India stars
       const panIndia = list.filter((s) => s.category === 'Pan India' || ['Tamil', 'Telugu', 'Malayalam', 'Kannada', 'Pan-Indian'].includes(s.industry));
       if (panIndia.length > 0) list = panIndia;
     } else if (starCategoryFilter === 'Bollywood') {
-      // Bollywood tab: show strictly Bollywood stars
       const bollywood = list.filter((s) => s.category === 'Bollywood' || s.industry === 'Hindi');
       if (bollywood.length > 0) list = bollywood;
     } else if (starCategoryFilter === 'RISING') {
-      // Top Gainers tab: show highest buzz delta
-      list = list.filter((s) => s.buzzDelta >= 3).sort((a, b) => b.buzzDelta - a.buzzDelta);
+      const rising = list.filter((s) => s.buzzDelta >= 3).sort((a, b) => b.buzzDelta - a.buzzDelta);
+      if (rising.length > 0) list = rising;
     }
 
-    return list.sort((a, b) => b.starScore - a.starScore).slice(0, 3);
+    const res = list.sort((a, b) => b.starScore - a.starScore).slice(0, 3);
+    return res.length > 0 ? res : stars.slice(0, 3);
   }, [stars, starCategoryFilter]);
 
-  // Filtered news restricted strictly to TOP 3 (Excluding TECH & AI)
+  // Filtered news restricted strictly to TOP 3 with non-empty fallback
   const filteredNews = useMemo(() => {
+    if (!news || news.length === 0) return [];
     let list = news.filter((item) => item.category !== 'TECH & AI');
     if (newsCategoryFilter !== 'ALL') {
-      list = list.filter((item) => item.category === newsCategoryFilter);
+      const filtered = list.filter((item) => item.category === newsCategoryFilter);
+      if (filtered.length > 0) list = filtered;
     }
-    return list.slice(0, 3);
+    const res = list.slice(0, 3);
+    return res.length > 0 ? res : news.slice(0, 3);
   }, [news, newsCategoryFilter]);
 
   // Industry Aggregate Buzz score

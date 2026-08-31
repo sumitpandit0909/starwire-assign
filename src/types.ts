@@ -82,7 +82,7 @@ export interface Star {
   tmdbId?: number;
   name: string;
   roles: string[];
-  category: 'Bollywood' | 'South' | 'Pan India';
+  category: 'Bollywood' | 'South' | 'Pan India' | 'Global';
   industry: string; // e.g. Hindi, Tamil, Telugu
   language: string;
   starScore: number;

@@ -199,32 +199,66 @@ export const RequestAccessView: React.FC<RequestAccessViewProps> = ({
       id="auth-main-container"
       className="min-h-screen w-full bg-[#131313] text-[#FAF9F6] flex flex-col md:flex-row overflow-y-auto font-sans"
     >
-      {/* Left Panel: Cinematic Brand Backdrop (45%) */}
+      {/* Left Panel: High-Definition Cinematic Media Backdrop (45%) */}
       <section className="hidden md:flex flex-col relative w-[45%] bg-[#1c1b1b] shrink-0 group overflow-hidden border-r border-[#4d4635]/25">
+        {/* Dynamic High-Definition Media Backdrop */}
         <div
-          className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105"
+          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 group-hover:scale-105"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80')`,
+            backgroundImage: `url('https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1600&q=85')`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#131313] via-[#131313]/70 to-black/50" />
+        {/* Dark Vignette & Gold Glow Overlays */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#131313] via-[#131313]/75 to-black/40" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#f2ca50]/10 via-transparent to-transparent pointer-events-none" />
 
+        {/* Content Overlay */}
         <div className="relative z-10 p-12 lg:p-16 flex flex-col h-full justify-between">
+          {/* Top Brand Header */}
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-lg bg-[#f2ca50] flex items-center justify-center text-[#131313]">
-              <span className="material-symbols-outlined text-[20px] font-bold">auto_awesome</span>
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#f2ca50] to-[#d4af37] flex items-center justify-center text-[#131313] shadow-lg shadow-[#f2ca50]/30">
+              <span className="material-symbols-outlined text-[22px] font-bold">auto_awesome</span>
             </div>
-            <span className="font-wordmark text-[14px] text-[#f2ca50] tracking-[0.35em] font-bold">
-              STARWIRE INTELLIGENCE
-            </span>
+            <div>
+              <span className="font-wordmark text-[14px] text-[#f2ca50] tracking-[0.35em] font-bold block">
+                STARWIRE
+              </span>
+              <span className="font-mono text-[9px] text-[#10B981] tracking-widest uppercase font-bold block">
+                INTELLIGENCE
+              </span>
+            </div>
           </div>
 
-          <div className="max-w-md pb-8 space-y-4">
-            <h1 className="font-headline-xl text-3xl lg:text-4xl text-[#FAF9F6] font-bold leading-tight">
-              Real-time entertainment intelligence &amp; talent analytics.
+          {/* Middle Floating Live Telemetry Cards */}
+          <div className="my-auto space-y-4 max-w-sm pt-8">
+            <div className="bg-[#131313]/85 backdrop-blur-xl border border-[#f2ca50]/30 rounded-2xl p-4 shadow-2xl flex items-center gap-4 transform transition-transform group-hover:translate-x-1">
+              <div className="w-12 h-12 rounded-xl bg-[#f2ca50]/15 border border-[#f2ca50]/40 flex items-center justify-center text-[#f2ca50] shrink-0">
+                <span className="material-symbols-outlined text-[24px]">trending_up</span>
+              </div>
+              <div>
+                <span className="text-[10px] font-mono text-[#99907c] uppercase tracking-wider block">Global Telemetry</span>
+                <p className="text-base font-bold font-mono text-[#FAF9F6]">$4.8B+ Box Office Monitored</p>
+              </div>
+            </div>
+
+            <div className="bg-[#131313]/85 backdrop-blur-xl border border-[#4d4635]/30 rounded-2xl p-4 shadow-2xl flex items-center gap-4 transform transition-transform group-hover:translate-x-1 delay-150">
+              <div className="w-12 h-12 rounded-xl bg-[#06B6D4]/15 border border-[#06B6D4]/40 flex items-center justify-center text-[#06B6D4] shrink-0">
+                <span className="material-symbols-outlined text-[24px]">groups</span>
+              </div>
+              <div>
+                <span className="text-[10px] font-mono text-[#99907c] uppercase tracking-wider block">Talent Monitored</span>
+                <p className="text-base font-bold font-mono text-[#FAF9F6]">12,400+ Monitored Stars</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Headline Text */}
+          <div className="max-w-md pb-4 space-y-2">
+            <h1 className="font-headline-xl text-2xl lg:text-3xl text-[#FAF9F6] font-bold leading-tight">
+              Your front-row seat to entertainment intelligence.
             </h1>
-            <p className="text-sm text-[#d0c5af] font-light leading-relaxed">
-              Access live theatrical box office telemetry, audience polarity indices, and executive talent dossiers.
+            <p className="text-xs text-[#d0c5af] font-light leading-relaxed">
+              Access real-time box office telemetry, talent equity benchmarks, and executive AI dossiers.
             </p>
           </div>
         </div>

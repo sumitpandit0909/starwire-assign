@@ -138,7 +138,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   return (
     <div id="dashboard-view-container" className="flex flex-col gap-10 md:gap-14 animate-fade-in pb-12">
-      
+
       {/* 1. TOP-POSITIONED Breaking Wire Slow Marquee Ticker */}
       <div
         id="breaking-news-ticker"
@@ -172,7 +172,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Right Aligned Watchlist Icon */}
-        <div className="flex items-center gap-2 shrink-0 pl-3 border-l border-[#4d4635]/30">
+        {/* <div className="flex items-center gap-2 shrink-0 pl-3 border-l border-[#4d4635]/30">
           <button
             onClick={onOpenWatchlist}
             className="text-[#f2ca50] hover:text-[#ffe088] p-1.5 rounded-lg hover:bg-[#201f1f] transition-colors cursor-pointer"
@@ -181,7 +181,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           >
             <span className="material-symbols-outlined text-[20px]">bookmark</span>
           </button>
-        </div>
+        </div> */}
       </div>
 
       {/* 2. Hero Section & Command Panels */}
@@ -196,7 +196,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#131313] via-[#131313]/85 to-transparent" />
-        
+
         {/* Top Floating Badge */}
         <div className="absolute top-6 left-6 md:top-8 md:left-10 flex items-center gap-3 z-10">
           <span className="font-wordmark text-[12px] uppercase tracking-[0.35em] text-[#f2ca50]">
@@ -303,11 +303,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <button
                 key={period}
                 onClick={() => setBuzzTimeframe(period)}
-                className={`px-3 py-1 text-xs font-mono rounded-lg transition-all cursor-pointer ${
-                  buzzTimeframe === period
+                className={`px-3 py-1 text-xs font-mono rounded-lg transition-all cursor-pointer ${buzzTimeframe === period
                     ? 'bg-[#f2ca50] text-[#131313] font-bold shadow-sm'
                     : 'text-[#d0c5af] hover:text-[#FAF9F6]'
-                }`}
+                  }`}
               >
                 {period}
               </button>
@@ -317,7 +316,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
         {/* 3-Column Indicator Bento Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
+
           {/* Card 1: Aggregate Industry BuzzMeter Gauge */}
           <div
             id="buzzmeter-radial-card"
@@ -480,11 +479,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   <button
                     key={m}
                     onClick={() => setActivePlatformFilter(m)}
-                    className={`px-2 py-0.5 rounded transition-all cursor-pointer ${
-                      activePlatformFilter === m
+                    className={`px-2 py-0.5 rounded transition-all cursor-pointer ${activePlatformFilter === m
                         ? 'bg-[#f2ca50]/20 text-[#f2ca50] border border-[#f2ca50]/30 font-bold'
                         : 'text-[#99907c] hover:text-[#FAF9F6]'
-                    }`}
+                      }`}
                   >
                     {m}
                   </button>
@@ -502,13 +500,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   </div>
                   <div className="w-full bg-[#2a2a2a] rounded-full h-2 overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all duration-1000 ${
-                        item.shortName === 'Insta'
+                      className={`h-full rounded-full transition-all duration-1000 ${item.shortName === 'Insta'
                           ? 'bg-[#10B981]'
                           : item.shortName === 'X'
-                          ? 'bg-[#f2ca50]'
-                          : 'bg-[#b4c5ff]'
-                      }`}
+                            ? 'bg-[#f2ca50]'
+                            : 'bg-[#b4c5ff]'
+                        }`}
                       style={{ width: `${item.percentage}%` }}
                     />
                   </div>
@@ -555,11 +552,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <button
                 key={tab.key}
                 onClick={() => setStarCategoryFilter(tab.key)}
-                className={`px-3.5 py-1.5 text-xs font-mono tracking-wider rounded-xl transition-all cursor-pointer ${
-                  starCategoryFilter === tab.key
+                className={`px-3.5 py-1.5 text-xs font-mono tracking-wider rounded-xl transition-all cursor-pointer ${starCategoryFilter === tab.key
                     ? 'bg-[#f2ca50] text-[#131313] font-bold shadow-md'
                     : 'bg-[#1c1b1b] text-[#d0c5af] border border-[#4d4635]/30 hover:border-[#f2ca50]/40'
-                }`}
+                  }`}
               >
                 {tab.label}
               </button>
@@ -687,11 +683,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
                     <button
                       onClick={() => onToggleFollow(star.id)}
-                      className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
-                        isFollowing
+                      className={`p-2.5 rounded-xl border transition-all cursor-pointer ${isFollowing
                           ? 'border-[#f2ca50] bg-[#f2ca50]/15 text-[#f2ca50]'
                           : 'border-[#4d4635]/40 text-[#99907c] hover:text-[#FAF9F6] hover:border-[#f2ca50]/40'
-                      }`}
+                        }`}
                       title={isFollowing ? 'Tracking Star' : 'Follow Star'}
                       aria-label={isFollowing ? 'Tracking Star' : 'Follow Star'}
                     >
@@ -735,11 +730,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <button
                 key={tab.key}
                 onClick={() => setTmdbCategory(tab.key)}
-                className={`px-3.5 py-1.5 text-xs font-mono tracking-wider rounded-xl transition-all cursor-pointer ${
-                  tmdbCategory === tab.key
+                className={`px-3.5 py-1.5 text-xs font-mono tracking-wider rounded-xl transition-all cursor-pointer ${tmdbCategory === tab.key
                     ? 'bg-[#f2ca50] text-[#131313] font-bold shadow-md'
                     : 'bg-[#1c1b1b] text-[#d0c5af] border border-[#4d4635]/30 hover:border-[#f2ca50]/40'
-                }`}
+                  }`}
               >
                 {tab.label}
               </button>
@@ -900,11 +894,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <button
                 key={cat}
                 onClick={() => setNewsCategoryFilter(cat)}
-                className={`px-3 py-1.5 text-xs font-mono tracking-wider rounded-xl transition-all cursor-pointer ${
-                  newsCategoryFilter === cat
+                className={`px-3 py-1.5 text-xs font-mono tracking-wider rounded-xl transition-all cursor-pointer ${newsCategoryFilter === cat
                     ? 'bg-[#f2ca50] text-[#131313] font-bold shadow-md'
                     : 'bg-[#1c1b1b] text-[#d0c5af] border border-[#4d4635]/30 hover:border-[#f2ca50]/40'
-                }`}
+                  }`}
               >
                 {cat}
               </button>
@@ -939,7 +932,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#1c1b1b] via-transparent to-transparent" />
-                
+
                 <div className="absolute top-3 left-3 flex items-center gap-2">
                   <span
                     className="font-data-label text-[10px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-md bg-[#131313]/90 backdrop-blur-sm border border-white/10"
@@ -1017,13 +1010,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
               <div className="w-full bg-[#2a2a2a] rounded-full h-2 overflow-hidden">
                 <div
-                  className={`h-full rounded-full transition-all duration-1000 ${
-                    reg.region === 'South'
+                  className={`h-full rounded-full transition-all duration-1000 ${reg.region === 'South'
                       ? 'bg-[#10B981]'
                       : reg.region === 'North'
-                      ? 'bg-[#f2ca50]'
-                      : 'bg-[#b4c5ff]'
-                  }`}
+                        ? 'bg-[#f2ca50]'
+                        : 'bg-[#b4c5ff]'
+                    }`}
                   style={{ width: `${reg.percentage}%` }}
                 />
               </div>

@@ -106,7 +106,7 @@ export const SideNav: React.FC<SideNavProps> = ({
         <div className="pt-4">
           <button
             id="sidebar-view-intelligence-btn"
-            onClick={onOpenIntelligence}
+            onClick={() => handleNavClick('/intelligence')}
             className="w-full py-3 px-4 rounded-lg bg-[#d4af37] text-[#1A1A1A] font-data-value text-[13px] font-bold uppercase tracking-widest hover:bg-[#ffe088] transition-all duration-300 btn-glow flex items-center justify-center gap-2 active:scale-98 shadow-md cursor-pointer"
           >
             <span className="material-symbols-outlined text-[18px]">auto_awesome</span>

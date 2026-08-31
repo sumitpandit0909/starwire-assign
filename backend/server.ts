@@ -61,6 +61,7 @@ app.get('/api/user/activity', protect, getUserActivity);
 app.get('/api/health', getHealth);
 app.get('/api/news', getLiveNews);
 app.post('/api/intelligence', getOpenRouterIntelligence);
+app.post('/api/ai/analyze', getOpenRouterIntelligence);
 
 // Stars & Talent endpoints
 app.get('/api/stars', getStarsAggregated);

@@ -24,6 +24,7 @@ import { RequestAccessView } from './components/Auth/RequestAccessView';
 import { WatchlistView } from './components/Watchlist/WatchlistView';
 import { FollowingView } from './components/Following/FollowingView';
 import { ProfileView } from './components/Profile/ProfileView';
+import { IntelligenceView } from './components/Intelligence/IntelligenceView';
 import { TrendingView } from './components/Trending/TrendingView';
 import { MoviesView } from './components/Movies/MoviesView';
 import { MovieDetailsView } from './components/MovieDetails/MovieDetailsView';
@@ -149,6 +150,13 @@ const MainLayout: React.FC<{
   const closeIntelligenceModal = useDataStore((state) => state.closeIntelligenceModal);
   const isSearchModalOpen = useDataStore((state) => state.isSearchModalOpen);
   const setSearchModalOpen = useDataStore((state) => state.setSearchModalOpen);
+  const handleOpenIntelligence = (starName?: string) => {
+    if (starName) {
+      navigate(`/intelligence?star=${encodeURIComponent(starName)}`);
+    } else {
+      navigate('/intelligence');
+    }
+  };
   const isMobileNavOpen = useDataStore((state) => state.isMobileNavOpen);
   const setMobileNavOpen = useDataStore((state) => state.setMobileNavOpen);
   const watchlistSubTab = useDataStore((state) => state.watchlistSubTab);
@@ -233,7 +241,7 @@ const MainLayout: React.FC<{
                   onViewAllNews={() => navigate('/news')}
                   onOpenFollowing={() => navigate('/following')}
                   onOpenWatchlist={() => navigate('/watchlist')}
-                  onOpenIntelligence={openIntelligenceModal}
+                  onOpenIntelligence={handleOpenIntelligence}
                   onToggleFollow={toggleFollowStar}
                   followingIds={followingIds}
                   watchlistCount={watchlistNewsIds.length}
@@ -264,7 +272,7 @@ const MainLayout: React.FC<{
                   selectStar={selectStar}
                   followingIds={followingIds}
                   toggleFollowStar={toggleFollowStar}
-                  openIntelligenceModal={openIntelligenceModal}
+                  openIntelligenceModal={handleOpenIntelligence}
                 />
               }
             />
@@ -280,7 +288,7 @@ const MainLayout: React.FC<{
                     navigate(`/star/${id}`);
                   }}
                   onToggleFollow={toggleFollowStar}
-                  onOpenIntelligence={openIntelligenceModal}
+                  onOpenIntelligence={handleOpenIntelligence}
                 />
               }
             />
@@ -292,7 +300,7 @@ const MainLayout: React.FC<{
                   watchlistNews={watchlistNewsList}
                   onSelectNews={(id) => openNewsModal(id)}
                   onRemoveBookmark={toggleBookmarkNews}
-                  onOpenIntelligence={openIntelligenceModal}
+                  onOpenIntelligence={handleOpenIntelligence}
                 />
               }
             />
@@ -308,7 +316,7 @@ const MainLayout: React.FC<{
                   }}
                   followingIds={followingIds}
                   onToggleFollow={toggleFollowStar}
-                  onOpenIntelligence={openIntelligenceModal}
+                  onOpenIntelligence={handleOpenIntelligence}
                 />
               }
             />
@@ -322,14 +330,14 @@ const MainLayout: React.FC<{
                     selectStar(id);
                     navigate(`/star/${id}`);
                   }}
-                  onOpenIntelligence={openIntelligenceModal}
+                  onOpenIntelligence={handleOpenIntelligence}
                 />
               }
             />
 
             <Route
               path="/movie/:id"
-              element={<MovieDetailsRouteWrapper openIntelligenceModal={openIntelligenceModal} />}
+              element={<MovieDetailsRouteWrapper openIntelligenceModal={handleOpenIntelligence} />}
             />
 
             <Route
@@ -355,6 +363,22 @@ const MainLayout: React.FC<{
                   onShowToast={showToast}
                   onNavigateFollowing={() => navigate('/following')}
                   onNavigateWatchlist={() => navigate('/watchlist')}
+                />
+              }
+            />
+
+            <Route
+              path="/intelligence"
+              element={
+                <IntelligenceView
+                  stars={stars}
+                  news={news}
+                  onSelectNews={(id) => openNewsModal(id)}
+                  onSelectStar={(id) => {
+                    selectStar(id);
+                    navigate(`/star/${id}`);
+                  }}
+                  onShowToast={showToast}
                 />
               }
             />

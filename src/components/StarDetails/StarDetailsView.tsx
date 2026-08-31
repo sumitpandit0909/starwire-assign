@@ -16,6 +16,53 @@ interface StarDetailsViewProps {
   onOpenIntelligence: (starName?: string) => void;
 }
 
+// Shimmer Skeleton Loader for Star Details Page
+const SkeletonStarDetails: React.FC = () => (
+  <div className="flex flex-col min-h-screen -mt-8 -mx-4 md:-mx-12 animate-pulse pb-12">
+    <div className="px-4 md:px-12 py-4 border-b border-[#4d4635]/20 bg-[#131313]">
+      <div className="h-5 w-44 bg-[#2a2a2a] rounded" />
+    </div>
+
+    <div className="h-[400px] md:h-[480px] bg-[#1c1b1b] relative p-6 md:p-12 flex flex-col justify-end">
+      <div className="flex flex-col md:flex-row items-start md:items-end gap-8 max-w-[1440px] mx-auto w-full">
+        <div className="w-36 h-36 md:w-48 md:h-48 rounded-2xl bg-[#2a2a2a] shrink-0 border-2 border-[#4d4635]/30" />
+        <div className="space-y-4 flex-1">
+          <div className="h-6 bg-[#2a2a2a] rounded w-28" />
+          <div className="h-10 bg-[#2a2a2a] rounded w-1/2" />
+          <div className="h-4 bg-[#2a2a2a] rounded w-1/3" />
+          <div className="flex gap-3 pt-2">
+            <div className="h-10 bg-[#2a2a2a] rounded-xl w-32" />
+            <div className="h-10 bg-[#2a2a2a] rounded-xl w-36" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div className="px-4 md:px-12 max-w-[1440px] mx-auto w-full mt-8 space-y-8">
+      {/* 4 Metrics Grid Skeleton */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map((n) => (
+          <div key={n} className="bg-[#1c1b1b] border border-[#4d4635]/20 rounded-2xl p-5 space-y-2 h-24">
+            <div className="h-3 bg-[#2a2a2a] rounded w-1/2" />
+            <div className="h-6 bg-[#2a2a2a] rounded w-3/4" />
+          </div>
+        ))}
+      </div>
+
+      {/* Main Bio & Chart Skeleton */}
+      <div className="bg-[#1c1b1b] border border-[#4d4635]/20 rounded-2xl p-6 md:p-8 space-y-6">
+        <div className="h-7 bg-[#2a2a2a] rounded w-48" />
+        <div className="space-y-2">
+          <div className="h-4 bg-[#2a2a2a] rounded w-full" />
+          <div className="h-4 bg-[#2a2a2a] rounded w-5/6" />
+          <div className="h-4 bg-[#2a2a2a] rounded w-2/3" />
+        </div>
+        <div className="h-56 bg-[#201f1f] rounded-2xl border border-[#4d4635]/20" />
+      </div>
+    </div>
+  </div>
+);
+
 export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
   star,
   allStars,
@@ -28,7 +75,7 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
   const [activeTimeframe, setActiveTimeframe] = useState<'1M' | '3M' | '6M' | '1Y' | 'ALL'>('6M');
   const [activeTab, setActiveTab] = useState<'dossier' | 'filmography' | 'tmdb_credits'>('dossier');
   const [tmdbPerson, setTmdbPerson] = useState<TMDBPerson | null>(null);
-  const [loadingTmdb, setLoadingTmdb] = useState<boolean>(false);
+  const [loadingTmdb, setLoadingTmdb] = useState<boolean>(true);
 
   // Fetch real-time TMDB details via /api/tmdb/person/:id
   useEffect(() => {
@@ -67,6 +114,10 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
     };
   }, [star]);
 
+  if (loadingTmdb) {
+    return <SkeletonStarDetails />;
+  }
+
   // Trajectory points based on active timeframe
   const trajectoryPoints = star.history?.[activeTimeframe] || [
     { label: 'Nov 23', value: 220 },
@@ -89,7 +140,7 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
     .join(' ');
 
   const displayName = tmdbPerson?.name || star.name;
-  const bioText = tmdbPerson?.biography || star.dossierBio;
+  const displayBio = tmdbPerson?.biography || star.dossierBio;
   const castCredits = tmdbPerson?.movie_credits?.cast || [];
 
   return (
@@ -138,409 +189,246 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
           </div>
 
-          {/* Info Block */}
-          <div className="flex-1 w-full flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
-                <span className="bg-[#f2ca50]/15 text-[#f2ca50] font-data-label text-[11px] px-3 py-1 rounded uppercase tracking-wider border border-[#f2ca50]/30 font-semibold backdrop-blur-md">
-                  {star.roles.join(' · ')} · {star.category}
+          {/* Identity & Main Actions */}
+          <div className="flex-1 space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="px-3 py-0.5 rounded-full bg-[#f2ca50]/20 text-[#f2ca50] border border-[#f2ca50]/40 text-xs font-mono font-bold uppercase tracking-wider">
+                {star.category || tmdbPerson?.known_for_department || 'GLOBAL CINEMA'}
+              </span>
+              {star.language && (
+                <span className="px-3 py-0.5 rounded-full bg-[#201f1f] text-[#d0c5af] border border-[#4d4635]/40 text-xs font-mono">
+                  {star.language}
                 </span>
-                {tmdbPerson?.popularity && (
-                  <span className="flex items-center text-[#10B981] text-xs font-mono font-medium bg-[#10B981]/10 px-2.5 py-0.5 rounded border border-[#10B981]/30">
-                    ★ TMDB Pop: {tmdbPerson.popularity.toFixed(1)}
-                  </span>
-                )}
-              </div>
-              <h1 className="font-headline-xl-mobile md:font-headline-xl text-3xl md:text-5xl text-[#FAF9F6] tracking-tight">
-                {displayName}
-              </h1>
-              {tmdbPerson?.place_of_birth && (
-                <p className="text-xs text-[#d0c5af] font-mono">
-                  Born in {tmdbPerson.place_of_birth} {tmdbPerson.birthday ? `(${tmdbPerson.birthday})` : ''}
-                </p>
               )}
             </div>
 
-            {/* CTA Actions */}
-            <div className="flex items-center gap-3 w-full md:w-auto">
+            <h1 className="font-headline-xl text-3xl md:text-5xl lg:text-6xl text-[#FAF9F6] font-bold tracking-tight">
+              {displayName}
+            </h1>
+
+            <p className="text-xs md:text-sm text-[#d0c5af] font-mono flex items-center gap-4">
+              <span>Primary Role: <strong className="text-[#FAF9F6]">{star.roles?.[0] || tmdbPerson?.known_for_department || 'Actor'}</strong></span>
+              {tmdbPerson?.place_of_birth && (
+                <span>Born: <strong className="text-[#FAF9F6]">{tmdbPerson.place_of_birth}</strong></span>
+              )}
+            </p>
+
+            {/* Quick Action CTAs */}
+            <div className="pt-2 flex flex-wrap items-center gap-4">
               <button
-                id="details-follow-btn"
+                id="follow-star-cta-btn"
                 onClick={() => onToggleFollow(star.id)}
-                className={`px-8 py-3.5 rounded-xl transition-all duration-300 font-data-value text-[13px] uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer ${
+                className={`px-6 py-3 rounded-xl font-data-label text-xs uppercase tracking-wider font-bold transition-all shadow-lg flex items-center gap-2 cursor-pointer ${
                   isFollowing
-                    ? 'bg-[#1c1b1b] text-[#f2ca50] border border-[#f2ca50]'
-                    : 'bg-[#f2ca50] text-[#131313] font-bold bloom-hover'
+                    ? 'bg-[#f2ca50]/20 text-[#f2ca50] border border-[#f2ca50]'
+                    : 'bg-[#f2ca50] text-[#131313] hover:bg-[#d4af37]'
                 }`}
               >
                 <span className="material-symbols-outlined text-[18px]">
-                  {isFollowing ? 'check' : 'person_add'}
+                  {isFollowing ? 'bookmark_added' : 'bookmark_add'}
                 </span>
-                <span>{isFollowing ? 'Following' : 'Follow Star'}</span>
+                <span>{isFollowing ? 'Following Dossier' : 'Follow Star Dossier'}</span>
               </button>
 
               <button
-                id="details-query-intel-btn"
+                id="run-ai-intelligence-cta-btn"
                 onClick={() => onOpenIntelligence(displayName)}
-                className="px-4 py-3.5 rounded-xl bg-[#2a2a2a] text-[#FAF9F6] hover:text-[#f2ca50] border border-[#4d4635]/40 transition-colors font-data-label text-xs uppercase cursor-pointer"
-                title="AI Career Analysis"
+                className="px-6 py-3 rounded-xl bg-[#2a2a2a] hover:bg-[#f2ca50] text-[#FAF9F6] hover:text-[#131313] font-data-label text-xs uppercase tracking-wider font-bold transition-all border border-[#4d4635]/40 flex items-center gap-2 cursor-pointer shadow-lg"
               >
                 <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
+                <span>Run Gemini AI Intelligence</span>
               </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Main Grid */}
-      <div className="max-w-[1440px] mx-auto px-4 md:px-12 py-12 grid grid-cols-1 lg:grid-cols-12 gap-8 w-full">
-        {/* Main Content Column (8 Cols) */}
-        <div className="lg:col-span-8 space-y-10">
-          {/* Intelligence Metrics Bento Grid */}
-          <section id="star-intelligence-metrics-section">
-            <h2 className="font-headline-md text-xl md:text-2xl text-[#FAF9F6] mb-6 flex items-center gap-3">
-              <span className="material-symbols-outlined text-[#f2ca50] text-[28px]">
-                monitoring
-              </span>
-              Star Intelligence Metrics
-            </h2>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {/* Metric 1: Star Score */}
-              <div className="bg-[#1c1b1b] rounded-2xl p-5 gold-border-subtle flex flex-col justify-between h-36 relative overflow-hidden group hover:bg-[#201f1f] transition-all">
-                <span className="font-data-label text-[11px] text-[#d0c5af] uppercase tracking-wider">
-                  StarScore™
-                </span>
-                <div className="flex items-end gap-2">
-                  <span className="font-headline-lg text-3xl md:text-4xl text-[#f2ca50] font-bold leading-none">
-                    {star.starScore}
-                  </span>
-                  <span className="text-[#10B981] text-xs font-mono flex items-center pb-1 font-semibold">
-                    <span className="material-symbols-outlined text-[14px]">trending_up</span>
-                    +{star.buzzDelta}%
-                  </span>
-                </div>
-              </div>
-
-              {/* Metric 2: TMDB Popularity */}
-              <div className="bg-[#1c1b1b] rounded-2xl p-5 gold-border-subtle flex flex-col justify-between h-36 relative overflow-hidden group hover:bg-[#201f1f] transition-all">
-                <span className="font-data-label text-[11px] text-[#d0c5af] uppercase tracking-wider">
-                  TMDB Popularity
-                </span>
-                <div>
-                  <div className="flex items-end gap-1.5 mb-2">
-                    <span className="font-headline-lg text-3xl md:text-4xl text-[#FAF9F6] font-bold leading-none">
-                      {tmdbPerson?.popularity ? tmdbPerson.popularity.toFixed(0) : star.buzzMeter || 84}
-                    </span>
-                    <span className="text-[#d0c5af] text-xs font-mono pb-1">Index</span>
-                  </div>
-                  <div className="w-full bg-[#353534] h-1.5 rounded-full overflow-hidden">
-                    <div
-                      className="bg-[#f2ca50] h-full rounded-full transition-all duration-1000"
-                      style={{ width: `${Math.min(100, (tmdbPerson?.popularity || 80) * 1.2)}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Metric 3: Audience Reach */}
-              <div className="bg-[#1c1b1b] rounded-2xl p-5 gold-border-subtle flex flex-col justify-between h-36 relative overflow-hidden group hover:bg-[#201f1f] transition-all">
-                <span className="font-data-label text-[11px] text-[#d0c5af] uppercase tracking-wider">
-                  Audience Reach
-                </span>
-                <div className="flex items-end gap-2">
-                  <span className="font-headline-lg text-3xl md:text-4xl text-[#FAF9F6] font-bold leading-none">
-                    {star.globalReachCount || star.reach}
-                  </span>
-                </div>
-              </div>
-
-              {/* Metric 4: Filmography Count */}
-              <div className="bg-[#1c1b1b] rounded-2xl p-5 gold-border-subtle flex flex-col justify-between h-36 relative overflow-hidden group hover:bg-[#201f1f] transition-all">
-                <span className="font-data-label text-[11px] text-[#d0c5af] uppercase tracking-wider">
-                  Movies &amp; Works
-                </span>
-                <div className="flex items-end gap-2">
-                  <span className="font-headline-lg text-3xl md:text-4xl text-[#FAF9F6] font-bold leading-none">
-                    {castCredits.length || star.films?.length || 12}
-                  </span>
-                  <span className="text-[#d0c5af] text-xs font-mono pb-1">Films</span>
-                </div>
-              </div>
+      {/* Main Metrics & Telemetry Grid */}
+      <section className="px-4 md:px-12 max-w-[1440px] mx-auto w-full space-y-8 mt-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-[#1c1b1b] border border-[#4d4635]/30 rounded-2xl p-5 space-y-1 shadow-lg">
+            <span className="text-[10px] font-mono text-[#99907c] uppercase tracking-wider block">TMDB Popularity / StarScore</span>
+            <div className="text-2xl font-bold font-mono text-[#f2ca50] flex items-center gap-2">
+              <span>★ {tmdbPerson?.popularity ? tmdbPerson.popularity.toFixed(0) : star.starScore}</span>
+              <span className="text-xs text-[#10B981] font-normal">+{star.buzzDelta}%</span>
             </div>
-          </section>
+          </div>
 
-          {/* Dossier Tabs & Narrative Section */}
-          <section className="bg-[#1c1b1b] rounded-2xl p-6 md:p-8 gold-border-subtle space-y-6">
-            <div className="flex items-center justify-between border-b border-[#4d4635]/25 pb-4">
-              <div className="flex gap-4 md:gap-6 overflow-x-auto">
-                <button
-                  onClick={() => setActiveTab('dossier')}
-                  className={`font-data-label text-[12px] uppercase tracking-widest pb-2 transition-all whitespace-nowrap cursor-pointer ${
-                    activeTab === 'dossier'
-                      ? 'text-[#f2ca50] border-b-2 border-[#f2ca50] font-bold'
-                      : 'text-[#d0c5af] hover:text-[#f2ca50]'
-                  }`}
-                >
-                  Biography &amp; Overview
-                </button>
-                <button
-                  onClick={() => setActiveTab('tmdb_credits')}
-                  className={`font-data-label text-[12px] uppercase tracking-widest pb-2 transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
-                    activeTab === 'tmdb_credits'
-                      ? 'text-[#f2ca50] border-b-2 border-[#f2ca50] font-bold'
-                      : 'text-[#d0c5af] hover:text-[#f2ca50]'
-                  }`}
-                >
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#10B981]" />
-                  <span>TMDB Movie Credits ({castCredits.length})</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('filmography')}
-                  className={`font-data-label text-[12px] uppercase tracking-widest pb-2 transition-all whitespace-nowrap cursor-pointer ${
-                    activeTab === 'filmography'
-                      ? 'text-[#f2ca50] border-b-2 border-[#f2ca50] font-bold'
-                      : 'text-[#d0c5af] hover:text-[#f2ca50]'
-                  }`}
-                >
-                  Box Office Milestones
-                </button>
-              </div>
-
-              {tmdbPerson?.birthday && (
-                <span className="text-[11px] font-mono text-[#d0c5af] hidden sm:inline">
-                  Born: {tmdbPerson.birthday}
-                </span>
-              )}
+          <div className="bg-[#1c1b1b] border border-[#4d4635]/30 rounded-2xl p-5 space-y-1 shadow-lg">
+            <span className="text-[10px] font-mono text-[#99907c] uppercase tracking-wider block">Global Reach</span>
+            <div className="text-2xl font-bold font-mono text-[#FAF9F6]">
+              {star.globalReachCount || '45M'}
             </div>
+          </div>
 
-            {activeTab === 'dossier' && (
-              <div className="space-y-6">
-                <div className="font-body-lg text-[15px] md:text-[17px] text-[#d0c5af] leading-relaxed font-light whitespace-pre-line">
-                  {bioText}
-                </div>
+          <div className="bg-[#1c1b1b] border border-[#4d4635]/30 rounded-2xl p-5 space-y-1 shadow-lg">
+            <span className="text-[10px] font-mono text-[#99907c] uppercase tracking-wider block">Audience Sentiment</span>
+            <div className="text-base font-bold font-mono text-[#10B981] truncate">
+              {star.activeSignals?.audienceSentiment || 'Overwhelmingly Positive'}
+            </div>
+          </div>
 
-                {/* Key Attributes Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-[#4d4635]/20 text-xs font-mono">
-                  <div>
-                    <span className="text-[#99907c] uppercase text-[10px] block">Birth Date</span>
-                    <span className="text-[#FAF9F6] font-semibold">{tmdbPerson?.birthday || star.birthDate || 'N/A'}</span>
-                  </div>
-                  <div>
-                    <span className="text-[#99907c] uppercase text-[10px] block">Place of Birth</span>
-                    <span className="text-[#f2ca50] font-semibold truncate block">{tmdbPerson?.place_of_birth || star.industry}</span>
-                  </div>
-                  <div>
-                    <span className="text-[#99907c] uppercase text-[10px] block">Primary Department</span>
-                    <span className="text-[#FAF9F6] font-semibold">{tmdbPerson?.known_for_department || star.roles[0]}</span>
-                  </div>
-                  <div>
-                    <span className="text-[#99907c] uppercase text-[10px] block">IMDb Profile</span>
-                    {tmdbPerson?.imdb_id ? (
-                      <a
-                        href={`https://www.imdb.com/name/${tmdbPerson.imdb_id}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-[#f2ca50] hover:underline font-semibold"
+          <div className="bg-[#1c1b1b] border border-[#4d4635]/30 rounded-2xl p-5 space-y-1 shadow-lg">
+            <span className="text-[10px] font-mono text-[#99907c] uppercase tracking-wider block">Social Buzz Rate</span>
+            <div className="text-base font-bold font-mono text-[#f2ca50] truncate">
+              {star.activeSignals?.socialBuzzRate || 'High Velocity'}
+            </div>
+          </div>
+        </div>
+
+        {/* Tab Selector */}
+        <div className="flex border-b border-[#4d4635]/30 gap-8">
+          <button
+            onClick={() => setActiveTab('dossier')}
+            className={`pb-4 text-sm font-mono uppercase tracking-wider transition-all cursor-pointer ${
+              activeTab === 'dossier'
+                ? 'text-[#f2ca50] font-bold border-b-2 border-[#f2ca50]'
+                : 'text-[#d0c5af] hover:text-[#FAF9F6]'
+            }`}
+          >
+            Executive Dossier &amp; Bio
+          </button>
+          <button
+            onClick={() => setActiveTab('tmdb_credits')}
+            className={`pb-4 text-sm font-mono uppercase tracking-wider transition-all cursor-pointer ${
+              activeTab === 'tmdb_credits'
+                ? 'text-[#f2ca50] font-bold border-b-2 border-[#f2ca50]'
+                : 'text-[#d0c5af] hover:text-[#FAF9F6]'
+            }`}
+          >
+            TMDB Filmography ({castCredits.length})
+          </button>
+        </div>
+
+        {/* Tab 1: Dossier Bio & Trajectory Chart */}
+        {activeTab === 'dossier' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 bg-[#1c1b1b] border border-[#4d4635]/30 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl">
+              <h2 className="font-headline-md text-xl text-[#FAF9F6] font-bold flex items-center gap-2">
+                <span className="material-symbols-outlined text-[#f2ca50]">description</span>
+                <span>Biography &amp; Career Intel</span>
+              </h2>
+              <p className="text-sm text-[#d0c5af] font-light leading-relaxed whitespace-pre-line">
+                {displayBio || 'No extended biography recorded in TMDB registry.'}
+              </p>
+
+              {/* Score Trajectory Graph */}
+              <div className="pt-6 border-t border-[#4d4635]/25 space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-mono text-[#d0c5af] uppercase tracking-wider font-bold">
+                    Historical Score Trajectory
+                  </span>
+                  <div className="flex gap-1 bg-[#131313] p-1 rounded-lg border border-[#4d4635]/30">
+                    {(['1M', '3M', '6M', '1Y', 'ALL'] as const).map((tf) => (
+                      <button
+                        key={tf}
+                        onClick={() => setActiveTimeframe(tf)}
+                        className={`px-2 py-0.5 text-[10px] font-mono rounded cursor-pointer ${
+                          activeTimeframe === tf ? 'bg-[#f2ca50] text-[#131313] font-bold' : 'text-[#d0c5af]'
+                        }`}
                       >
-                        View IMDb Page ↗
-                      </a>
-                    ) : (
-                      <span className="text-[#FAF9F6] font-semibold">Verified</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'tmdb_credits' && (
-              <div className="space-y-4">
-                {loadingTmdb ? (
-                  <div className="py-8 text-center text-xs font-mono text-[#d0c5af] animate-pulse">
-                    Loading complete TMDB movie credits...
-                  </div>
-                ) : castCredits.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
-                    {castCredits.slice(0, 24).map((credit: any, idx: number) => (
-                      <div
-                        key={idx}
-                        className="bg-[#201f1f] border border-[#4d4635]/30 rounded-xl overflow-hidden p-3 flex gap-3 items-center group hover:border-[#f2ca50]/60 transition-all"
-                      >
-                        <img
-                          src={getTMDBImageUrl(credit.poster_path, 'w185')}
-                          alt={credit.title || credit.name}
-                          className="w-14 aspect-[2/3] object-cover rounded-lg border border-[#4d4635]/40"
-                          referrerPolicy="no-referrer"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=300&q=80';
-                          }}
-                        />
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-headline-sm text-sm text-[#FAF9F6] group-hover:text-[#f2ca50] transition-colors truncate">
-                            {credit.title || credit.name}
-                          </h4>
-                          <div className="text-[11px] text-[#99907c] font-mono mt-0.5 truncate">
-                            {credit.character ? `as ${credit.character}` : credit.release_date ? credit.release_date.split('-')[0] : 'Feature Film'}
-                          </div>
-                          {credit.vote_average ? (
-                            <div className="text-[11px] font-mono text-[#f2ca50] mt-1 flex items-center gap-1">
-                              <span className="material-symbols-outlined text-[13px] fill-current">star</span>
-                              <span>{credit.vote_average.toFixed(1)} / 10</span>
-                            </div>
-                          ) : null}
-                        </div>
-                      </div>
+                        {tf}
+                      </button>
                     ))}
                   </div>
-                ) : (
-                  <div className="p-8 text-center text-xs font-mono text-[#d0c5af] bg-[#201f1f] rounded-xl border border-[#4d4635]/20">
-                    TMDB credits loaded. Use AI Analysis to summarize box office milestones.
+                </div>
+
+                <div className="h-44 w-full bg-[#131313] rounded-xl p-4 border border-[#4d4635]/20 relative">
+                  <svg className="w-full h-full overflow-visible" viewBox="0 0 100 40" preserveAspectRatio="none">
+                    <polyline
+                      fill="none"
+                      stroke="#f2ca50"
+                      strokeWidth="2"
+                      points={polylineCoords}
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Key Details */}
+            <div className="bg-[#1c1b1b] border border-[#4d4635]/30 rounded-2xl p-6 space-y-6 shadow-xl h-fit">
+              <h3 className="font-headline-md text-lg text-[#FAF9F6] font-bold pb-2 border-b border-[#4d4635]/25">
+                Talent Dossier Meta
+              </h3>
+
+              <div className="space-y-4 text-xs font-mono">
+                <div>
+                  <span className="text-[#99907c] block uppercase">Full Name</span>
+                  <span className="text-[#FAF9F6] font-bold text-sm">{displayName}</span>
+                </div>
+
+                {tmdbPerson?.birthday && (
+                  <div>
+                    <span className="text-[#99907c] block uppercase">Date of Birth</span>
+                    <span className="text-[#FAF9F6]">{tmdbPerson.birthday}</span>
                   </div>
                 )}
-              </div>
-            )}
 
-            {activeTab === 'filmography' && (
-              <div className="space-y-4">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs font-mono">
-                    <thead>
-                      <tr className="border-b border-[#4d4635]/30 text-[#99907c] uppercase tracking-wider">
-                        <th className="pb-3">Feature Title</th>
-                        <th className="pb-3">Year</th>
-                        <th className="pb-3">Gross Box Office</th>
-                        <th className="pb-3">Verdict</th>
-                        <th className="pb-3">Estimated ROI</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#4d4635]/15">
-                      {(star.films || []).map((film) => (
-                        <tr key={film.title} className="hover:bg-[#201f1f] transition-colors">
-                          <td className="py-3.5 text-[#FAF9F6] font-semibold font-sans">{film.title}</td>
-                          <td className="py-3.5 text-[#d0c5af]">{film.year}</td>
-                          <td className="py-3.5 text-[#f2ca50] font-bold">{film.boxOffice}</td>
-                          <td className="py-3.5">
-                            <span className="px-2 py-0.5 rounded bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30 text-[10px]">
-                              {film.verdict}
-                            </span>
-                          </td>
-                          <td className="py-3.5 text-[#d0c5af]">{film.roi}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                {tmdbPerson?.place_of_birth && (
+                  <div>
+                    <span className="text-[#99907c] block uppercase">Place of Birth</span>
+                    <span className="text-[#FAF9F6]">{tmdbPerson.place_of_birth}</span>
+                  </div>
+                )}
+
+                <div>
+                  <span className="text-[#99907c] block uppercase">Known For Department</span>
+                  <span className="text-[#f2ca50] font-bold">{tmdbPerson?.known_for_department || star.category}</span>
                 </div>
               </div>
-            )}
-          </section>
-        </div>
+            </div>
+          </div>
+        )}
 
-        {/* Sidebar Column (4 Cols) */}
-        <div className="lg:col-span-4 space-y-8">
-          {/* StarScore Trajectory Card */}
-          <div
-            id="starscore-trajectory-card"
-            className="bg-[#1c1b1b] rounded-2xl p-6 gold-border-subtle relative overflow-hidden flex flex-col justify-between"
-          >
-            <div className="flex items-center justify-between mb-4 z-10 relative">
-              <h3 className="font-data-label text-[11px] text-[#d0c5af] uppercase tracking-widest">
-                StarScore™ Trajectory
-              </h3>
-              <span className="text-[10px] font-mono text-[#10B981]">Apex Velocity</span>
+        {/* Tab 2: TMDB Live Filmography Credits */}
+        {activeTab === 'tmdb_credits' && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between text-xs font-mono text-[#d0c5af]">
+              <span>Live TMDB Filmography ({castCredits.length} Credits)</span>
             </div>
 
-            {/* Interactive SVG Line Chart */}
-            <div className="relative h-44 w-full flex items-end my-2">
-              <div className="absolute inset-0 w-full h-full border-b border-l border-[#4d4635]/25" />
-              
-              <svg
-                className="absolute inset-0 w-full h-full overflow-visible"
-                preserveAspectRatio="none"
-                viewBox="0 0 100 40"
-              >
-                <defs>
-                  <linearGradient id="chartGlow" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#f2ca50" stopOpacity="0.35" />
-                    <stop offset="100%" stopColor="#f2ca50" stopOpacity="0.0" />
-                  </linearGradient>
-                </defs>
-                <polygon points={`0,40 ${polylineCoords} 100,40`} fill="url(#chartGlow)" />
-                <polyline
-                  fill="none"
-                  points={polylineCoords}
-                  stroke="#C5A028"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+            {castCredits.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+                {castCredits.slice(0, 20).map((credit: any) => (
+                  <div
+                    key={`${credit.id}-${credit.character}`}
+                    className="bg-[#1c1b1b] border border-[#4d4635]/30 rounded-2xl overflow-hidden flex flex-col justify-between shadow-lg"
+                  >
+                    <div className="relative aspect-[2/3] w-full bg-[#201f1f]">
+                      <img
+                        src={getTMDBImageUrl(credit.poster_path, 'w342')}
+                        alt={credit.title}
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                      {credit.vote_average > 0 && (
+                        <div className="absolute top-2 right-2 bg-[#131313]/90 text-[#f2ca50] text-[10px] font-mono px-2 py-0.5 rounded font-bold">
+                          ★ {credit.vote_average.toFixed(1)}
+                        </div>
+                      )}
+                    </div>
 
-              <div className="w-full flex justify-between text-[9px] font-mono text-[#d0c5af]/60 pt-2 z-10">
-                {trajectoryPoints.map((p) => (
-                  <span key={p.label}>{p.label}</span>
+                    <div className="p-3">
+                      <h4 className="font-headline-md text-xs text-[#FAF9F6] font-bold line-clamp-1">
+                        {credit.title}
+                      </h4>
+                      <p className="text-[10px] text-[#99907c] font-mono truncate mt-0.5">
+                        Role: {credit.character || 'Self'}
+                      </p>
+                      <p className="text-[10px] text-[#d0c5af] font-mono mt-1">
+                        {credit.release_date ? credit.release_date.split('-')[0] : 'N/A'}
+                      </p>
+                    </div>
+                  </div>
                 ))}
               </div>
-            </div>
-
-            <div className="flex justify-between items-center pt-4 border-t border-[#4d4635]/20 font-data-label text-xs text-[#d0c5af]">
-              {(['1M', '3M', '6M', '1Y', 'ALL'] as const).map((tf) => (
-                <button
-                  key={tf}
-                  onClick={() => setActiveTimeframe(tf)}
-                  className={`px-2 py-1 transition-all cursor-pointer ${
-                    activeTimeframe === tf
-                      ? 'text-[#f2ca50] border-b border-[#f2ca50] font-bold'
-                      : 'hover:text-[#FAF9F6]'
-                  }`}
-                >
-                  {tf}
-                </button>
-              ))}
-            </div>
+            ) : (
+              <p className="text-xs font-mono text-[#d0c5af]">No filmography credits returned by TMDB for this person.</p>
+            )}
           </div>
-
-          {/* Active Signals Card */}
-          <div
-            id="active-signals-card"
-            className="bg-[#1c1b1b] rounded-2xl p-6 gold-border-subtle space-y-4"
-          >
-            <h3 className="font-data-label text-[11px] text-[#f2ca50] uppercase tracking-widest border-b border-[#4d4635]/25 pb-2">
-              Active Signals
-            </h3>
-
-            <div className="flex items-center gap-4 p-3.5 bg-[#201f1f] rounded-xl border border-[#4d4635]/20 hover:border-[#10B981]/40 transition-colors">
-              <div className="w-10 h-10 rounded-full bg-[#10B981]/15 flex items-center justify-center shrink-0 border border-[#10B981]/30">
-                <span className="material-symbols-outlined text-[#10B981] text-[20px]">
-                  sentiment_satisfied
-                </span>
-              </div>
-              <div>
-                <div className="font-data-label text-[10px] text-[#d0c5af] uppercase tracking-wider">
-                  Audience Sentiment
-                </div>
-                <div className="font-body-md text-[14px] text-[#FAF9F6] font-semibold mt-0.5">
-                  {star.activeSignals?.audienceSentiment || 'Overwhelmingly Positive'}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 p-3.5 bg-[#201f1f] rounded-xl border border-[#4d4635]/20 hover:border-[#f2ca50]/40 transition-colors">
-              <div className="w-10 h-10 rounded-full bg-[#f2ca50]/15 flex items-center justify-center shrink-0 border border-[#f2ca50]/30">
-                <span className="material-symbols-outlined text-[#f2ca50] text-[20px]">
-                  campaign
-                </span>
-              </div>
-              <div>
-                <div className="font-data-label text-[10px] text-[#d0c5af] uppercase tracking-wider">
-                  Social Buzz Rate
-                </div>
-                <div className="font-body-md text-[14px] text-[#FAF9F6] font-semibold mt-0.5">
-                  {star.activeSignals?.socialBuzzRate || 'High Velocity'}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+        )}
+      </section>
     </div>
   );
 };

@@ -27,6 +27,9 @@ export const SideNav: React.FC<SideNavProps> = ({
   const isCollapsed = externalIsCollapsed !== undefined ? externalIsCollapsed : internalIsCollapsed;
   const toggleCollapse = onToggleCollapse || (() => setInternalIsCollapsed(!internalIsCollapsed));
 
+  // On mobile drawer overlay, always show full text labels & titles
+  const showText = !isCollapsed || isOpenMobile;
+
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
     { path: '/explore', label: 'Explore Stars', icon: 'star' },
@@ -59,18 +62,18 @@ export const SideNav: React.FC<SideNavProps> = ({
           isCollapsed ? 'w-64 md:w-20 px-4 md:px-3' : 'w-64 px-5'
         } ${isOpenMobile ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
-        {/* Company Brand Header Anchor & Collapse Toggle */}
+        {/* Company Brand Header Anchor & Collapse / Close Toggle */}
         <div className="mb-8 flex items-center justify-between">
           <div
             id="sidebar-company-brand"
             onClick={() => handleNavClick('/dashboard')}
-            className={`flex items-center gap-3 cursor-pointer group ${isCollapsed ? 'justify-center w-full' : ''}`}
+            className={`flex items-center gap-3 cursor-pointer group ${!showText ? 'justify-center w-full' : ''}`}
             title="Starwire Intelligence"
           >
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#f2ca50] to-[#d4af37] flex items-center justify-center text-[#131313] shadow-lg shadow-[#f2ca50]/20 group-hover:scale-105 transition-transform shrink-0">
               <span className="material-symbols-outlined text-[24px] font-bold">auto_awesome</span>
             </div>
-            {!isCollapsed && (
+            {showText && (
               <div className="overflow-hidden transition-all duration-300">
                 <h1 className="font-wordmark text-base uppercase tracking-[0.35em] text-[#f2ca50] group-hover:text-[#ffe088] transition-colors font-bold whitespace-nowrap">
                   STARWIRE
@@ -93,10 +96,22 @@ export const SideNav: React.FC<SideNavProps> = ({
               <span className="material-symbols-outlined text-[20px]">chevron_left</span>
             </button>
           )}
+
+          {/* Mobile Close Button */}
+          {isOpenMobile && onCloseMobile && (
+            <button
+              onClick={onCloseMobile}
+              className="md:hidden p-1.5 rounded-lg text-[#d0c5af] hover:text-[#f2ca50] hover:bg-[#1c1b1b] transition-colors cursor-pointer"
+              title="Close Navigation"
+              aria-label="Close Navigation"
+            >
+              <span className="material-symbols-outlined text-[20px]">close</span>
+            </button>
+          )}
         </div>
 
-        {/* Collapsed Mode Expand Button */}
-        {isCollapsed && (
+        {/* Collapsed Mode Expand Button (Desktop Only) */}
+        {isCollapsed && !isOpenMobile && (
           <button
             onClick={toggleCollapse}
             className="hidden md:flex mx-auto mb-6 p-2 rounded-xl bg-[#1c1b1b] border border-[#4d4635]/30 text-[#d0c5af] hover:text-[#f2ca50] hover:border-[#f2ca50] transition-all cursor-pointer shadow-md justify-center items-center"
@@ -118,9 +133,9 @@ export const SideNav: React.FC<SideNavProps> = ({
                 key={item.path}
                 id={`nav-link-${item.path.replace('/', '')}`}
                 onClick={() => handleNavClick(item.path)}
-                title={isCollapsed ? item.label : undefined}
+                title={!showText ? item.label : undefined}
                 className={`w-full flex items-center rounded-xl transition-all duration-200 cursor-pointer ${
-                  isCollapsed
+                  !showText
                     ? 'justify-center p-3'
                     : 'gap-3.5 px-4 py-3 text-left font-data-label text-[13px] uppercase tracking-wider'
                 } ${
@@ -135,7 +150,7 @@ export const SideNav: React.FC<SideNavProps> = ({
                 >
                   {item.icon}
                 </span>
-                {!isCollapsed && <span className="truncate">{item.label}</span>}
+                {showText && <span className="truncate">{item.label}</span>}
               </button>
             );
           })}
@@ -146,13 +161,13 @@ export const SideNav: React.FC<SideNavProps> = ({
           <button
             id="sidebar-view-intelligence-btn"
             onClick={() => handleNavClick('/intelligence')}
-            title={isCollapsed ? 'AI Intelligence' : undefined}
+            title={!showText ? 'AI Intelligence' : undefined}
             className={`w-full rounded-xl bg-[#d4af37] text-[#1A1A1A] font-data-value font-bold uppercase tracking-widest hover:bg-[#ffe088] transition-all duration-300 btn-glow flex items-center justify-center cursor-pointer shadow-md ${
-              isCollapsed ? 'p-3' : 'py-3 px-4 text-[13px] gap-2 active:scale-98'
+              !showText ? 'p-3' : 'py-3 px-4 text-[13px] gap-2 active:scale-98'
             }`}
           >
             <span className="material-symbols-outlined text-[20px] shrink-0">auto_awesome</span>
-            {!isCollapsed && <span>AI Intelligence</span>}
+            {showText && <span>AI Intelligence</span>}
           </button>
         </div>
       </nav>

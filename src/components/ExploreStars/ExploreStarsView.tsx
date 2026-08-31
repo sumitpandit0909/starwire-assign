@@ -176,7 +176,7 @@ export const ExploreStarsView: React.FC<ExploreStarsViewProps> = ({
 
       {/* Grid of Stars / Skeleton Loading */}
       {loading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
             <SkeletonStarCard key={n} />
           ))}
@@ -186,7 +186,7 @@ export const ExploreStarsView: React.FC<ExploreStarsViewProps> = ({
           No stars found matching "{searchQuery}". Try searching another name.
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {people.map((person) => {
             const isFollowed = followingIds.includes(`tmdb-${person.id}`) || followingIds.includes(person.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
             return (

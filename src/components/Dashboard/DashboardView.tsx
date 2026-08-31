@@ -199,25 +199,25 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="absolute inset-0 bg-gradient-to-t from-[#131313] via-[#131313]/85 to-transparent" />
 
         {/* Top Floating Badge */}
-        <div className="absolute top-6 left-6 md:top-8 md:left-10 flex items-center gap-3 z-10">
-          <span className="font-wordmark text-[12px] uppercase tracking-[0.35em] text-[#f2ca50]">
+        <div className="absolute top-4 left-4 md:top-8 md:left-10 flex flex-wrap items-center gap-2 md:gap-3 z-10">
+          <span className="font-wordmark text-[10px] sm:text-[12px] uppercase tracking-[0.2em] sm:tracking-[0.35em] text-[#f2ca50]">
             ENTERTAINMENT INTELLIGENCE · STARWIRE
           </span>
-          <div className="h-1.5 w-1.5 rounded-full bg-[#10B981]" />
-          <span className="font-data-label text-[10px] text-[#d0c5af] uppercase tracking-widest">
+          <div className="hidden sm:inline-block h-1.5 w-1.5 rounded-full bg-[#10B981]" />
+          <span className="hidden sm:inline-block font-data-label text-[9px] sm:text-[10px] text-[#d0c5af] uppercase tracking-widest">
             REAL-TIME ANALYTICS
           </span>
         </div>
 
         {/* Hero Content */}
-        <div className="relative p-6 md:p-10 z-10 max-w-5xl">
+        <div className="relative p-4 sm:p-6 md:p-10 z-10 max-w-5xl">
           <h1
             id="hero-greeting-heading"
-            className="font-headline-xl-mobile md:font-headline-xl text-3xl md:text-5xl text-[#FAF9F6] mb-2 leading-tight"
+            className="font-headline-xl text-2xl sm:text-4xl md:text-5xl text-[#FAF9F6] mb-2 leading-tight tracking-tight break-words font-bold"
           >
             Good Evening, {user.userName.split(' ')[0]}.
           </h1>
-          <p className="font-body-lg text-[15px] md:text-[17px] text-[#d0c5af] mb-6 max-w-2xl font-light">
+          <p className="font-body-lg text-xs sm:text-base md:text-[17px] text-[#d0c5af] mb-4 sm:mb-6 max-w-2xl font-light leading-relaxed">
             Live box office momentum, StarScore™ talent equity benchmarks, and industry alerts.
           </p>
 

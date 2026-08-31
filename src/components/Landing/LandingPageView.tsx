@@ -120,15 +120,15 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
           </div>
 
           {/* Main Headline */}
-          <h1 className="font-headline-xl text-4xl sm:text-6xl md:text-7xl font-extrabold text-[#FAF9F6] tracking-tight leading-[1.08] max-w-5xl mx-auto">
-            The Executive Intelligence Terminal for <br />
+          <h1 className="font-headline-xl text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-[#FAF9F6] tracking-tight leading-[1.08] max-w-5xl mx-auto">
+            The Executive Intelligence Terminal for <br className="hidden sm:inline" />
             <span className="bg-gradient-to-r from-[#ffe088] via-[#f2ca50] to-[#c5a028] bg-clip-text text-transparent">
               Global Cinema &amp; Talent Equity
             </span>
           </h1>
 
           {/* Subtitle */}
-          <p className="font-body-lg text-base sm:text-lg md:text-xl text-[#d0c5af] max-w-3xl mx-auto font-light leading-relaxed">
+          <p className="font-body-lg text-sm sm:text-lg md:text-xl text-[#d0c5af] max-w-3xl mx-auto font-light leading-relaxed px-2">
             Harness proprietary StarScore™ talent equity benchmarks, Gemini AI-powered predictive intelligence, and theatrical box office telemetry for producers, distributors, and talent agencies.
           </p>
 
@@ -136,11 +136,11 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
           <div className="flex justify-center pt-4">
             <button
               onClick={handlePrimaryCta}
-              className="group flex items-center gap-3 px-9 py-4.5 rounded-2xl bg-gradient-to-r from-[#f2ca50] via-[#ffe088] to-[#f2ca50] bg-[length:200%_auto] hover:bg-right text-[#131313] font-bold text-sm uppercase tracking-wider transition-all duration-500 shadow-[0_0_30px_rgba(242,202,80,0.35)] hover:shadow-[0_0_50px_rgba(242,202,80,0.6)] hover:scale-105 active:scale-95 cursor-pointer font-data-label"
+              className="group flex items-center gap-2.5 sm:gap-3 px-6 sm:px-9 py-3.5 sm:py-4.5 rounded-2xl bg-gradient-to-r from-[#f2ca50] via-[#ffe088] to-[#f2ca50] bg-[length:200%_auto] hover:bg-right text-[#131313] font-bold text-xs sm:text-sm uppercase tracking-wider transition-all duration-500 shadow-[0_0_30px_rgba(242,202,80,0.35)] hover:shadow-[0_0_50px_rgba(242,202,80,0.6)] hover:scale-105 active:scale-95 cursor-pointer font-data-label"
             >
-              <span className="material-symbols-outlined text-[22px]">lock_open</span>
+              <span className="material-symbols-outlined text-[20px] sm:text-[22px]">lock_open</span>
               <span>{isAuthenticated ? 'Enter Terminal Dashboard' : 'Access Intelligence Terminal'}</span>
-              <span className="material-symbols-outlined text-[18px] group-hover:translate-x-1.5 transition-transform duration-300">
+              <span className="material-symbols-outlined text-[16px] sm:text-[18px] group-hover:translate-x-1.5 transition-transform duration-300">
                 arrow_forward
               </span>
             </button>
@@ -209,7 +209,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
             </div>
 
             {/* Terminal Tabs */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide max-w-full">
               {[
                 { key: 'ai', label: 'AI Intelligence Dossier' },
                 { key: 'boxOffice', label: 'Box Office Forecast' },

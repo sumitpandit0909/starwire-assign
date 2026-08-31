@@ -223,7 +223,7 @@ const MainLayout: React.FC<{
         />
 
         {/* Separate Page Routes */}
-        <main className="flex-1 px-4 md:px-12 py-8 max-w-[1440px] mx-auto w-full">
+        <main className="flex-1 px-3 sm:px-6 md:px-12 py-4 sm:py-6 md:py-8 max-w-[1440px] mx-auto w-full overflow-x-hidden">
           <Routes>
             <Route
               path="/dashboard"

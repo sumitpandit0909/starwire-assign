@@ -275,7 +275,22 @@ export const RequestAccessView: React.FC<RequestAccessViewProps> = ({
           <span className="material-symbols-outlined text-[18px]">close</span>
         </button>
 
-        <div className="w-full max-w-[480px] space-y-8 my-auto">
+        <div className="w-full max-w-[480px] space-y-6 sm:space-y-8 my-auto pt-8 md:pt-0">
+          {/* Mobile Top Brand Header */}
+          <div className="md:hidden flex items-center space-x-3 mb-2">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#f2ca50] to-[#d4af37] flex items-center justify-center text-[#131313] shadow-lg shadow-[#f2ca50]/30 shrink-0">
+              <span className="material-symbols-outlined text-[22px] font-bold">auto_awesome</span>
+            </div>
+            <div>
+              <span className="font-wordmark text-[14px] text-[#f2ca50] tracking-[0.35em] font-bold block">
+                STARWIRE
+              </span>
+              <span className="font-mono text-[9px] text-[#10B981] tracking-widest uppercase font-bold block">
+                INTELLIGENCE
+              </span>
+            </div>
+          </div>
+
           {/* Mode Switcher Tabs */}
           <div className="flex items-center p-1 bg-[#1c1b1b] border border-[#4d4635]/40 rounded-xl">
             <button
@@ -284,7 +299,7 @@ export const RequestAccessView: React.FC<RequestAccessViewProps> = ({
                 setAuthMode('signin');
                 clearFeedback();
               }}
-              className={`flex-1 py-2.5 text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
+              className={`flex-1 py-2 sm:py-2.5 text-[11px] sm:text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
                 authMode === 'signin'
                   ? 'bg-[#f2ca50] text-[#131313] shadow-md'
                   : 'text-[#d0c5af] hover:text-[#FAF9F6]'
@@ -299,7 +314,7 @@ export const RequestAccessView: React.FC<RequestAccessViewProps> = ({
                 setAuthMode('signup');
                 clearFeedback();
               }}
-              className={`flex-1 py-2.5 text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
+              className={`flex-1 py-2 sm:py-2.5 text-[11px] sm:text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
                 authMode === 'signup'
                   ? 'bg-[#f2ca50] text-[#131313] shadow-md'
                   : 'text-[#d0c5af] hover:text-[#FAF9F6]'
@@ -310,8 +325,8 @@ export const RequestAccessView: React.FC<RequestAccessViewProps> = ({
           </div>
 
           {/* Form Title */}
-          <div className="space-y-2">
-            <h2 className="font-headline-lg text-2xl md:text-3xl text-[#FAF9F6] font-bold">
+          <div className="space-y-1.5 sm:space-y-2">
+            <h2 className="font-headline-lg text-xl sm:text-2xl md:text-3xl text-[#FAF9F6] font-bold tracking-tight">
               {authMode === 'signup'
                 ? 'Register Account'
                 : authMode === 'signin'
@@ -322,7 +337,7 @@ export const RequestAccessView: React.FC<RequestAccessViewProps> = ({
                 ? 'Verify 6-Digit Code'
                 : 'Set New Password'}
             </h2>
-            <p className="text-xs font-mono text-[#d0c5af]">
+            <p className="text-xs font-mono text-[#d0c5af] leading-relaxed">
               {authMode === 'signup'
                 ? 'Enter your account details to access live intelligence telemetry.'
                 : authMode === 'signin'
@@ -332,7 +347,6 @@ export const RequestAccessView: React.FC<RequestAccessViewProps> = ({
                 : forgotStep === 'verify'
                 ? `Enter the 6-digit code dispatched to ${email}`
                 : 'Create a new secure password for your account.'}
-            </p>
           </div>
 
           {/* Feedback Banners */}

@@ -87,7 +87,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [buzzTimeframe, setBuzzTimeframe] = useState<'24H' | '7D' | '30D' | 'YTD'>('7D');
 
   // Live TMDB Movies Hook
-  const [tmdbCategory, setTmdbCategory] = useState<'indian' | 'trending' | 'now_playing'>('indian');
+  const [tmdbCategory, setTmdbCategory] = useState<'popular' | 'top_rated' | 'upcoming'>('popular');
   const { movies: fetchedTmdbMovies, people: fetchedTmdbPeople, loading: loadingTmdb } = useMovies(tmdbCategory);
   const [selectedTmdbMovie, setSelectedTmdbMovie] = useState<TMDBMovie | null>(null);
 
@@ -722,9 +722,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="flex flex-wrap items-center gap-2">
             {(
               [
-                { key: 'indian', label: 'Indian Cinema' },
-                { key: 'trending', label: 'Global Trending' },
-                { key: 'now_playing', label: 'In Theatres Now' },
+                { key: 'popular', label: 'Popular' },
+                { key: 'top_rated', label: 'Top Rated' },
+                { key: 'upcoming', label: 'Upcoming' },
               ] as const
             ).map((tab) => (
               <button

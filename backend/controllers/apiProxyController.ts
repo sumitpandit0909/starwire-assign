@@ -13,7 +13,7 @@ const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 // TMDB Fetch Helper - Official TMDB API Integration with Retry Resilience
 async function fetchTMDB(endpoint: string, params: Record<string, string> = {}, retries = 3): Promise<any> {
   const url = new URL(`${TMDB_BASE_URL}${endpoint}`);
-  
+
   if (!params.language) {
     url.searchParams.set('language', 'en-US');
   }
@@ -21,7 +21,7 @@ async function fetchTMDB(endpoint: string, params: Record<string, string> = {}, 
   if (TMDB_API_KEY) {
     url.searchParams.set('api_key', TMDB_API_KEY);
   }
-  
+
   for (const [key, val] of Object.entries(params)) {
     if (val !== undefined && val !== null && val !== '') {
       url.searchParams.set(key, val);
@@ -93,7 +93,7 @@ function mapTMDBPersonToStar(p: any, index = 0): any {
   const profileUrl = p.profile_path
     ? `https://image.tmdb.org/t/p/w500${p.profile_path}`
     : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80';
-  
+
   const knownFilms = (p.known_for || p.movie_credits?.cast || []).slice(0, 5).map((m: any) => ({
     title: m.title || m.name || 'Feature Film',
     year: m.release_date ? parseInt(m.release_date.slice(0, 4), 10) || 2024 : 2024,
@@ -384,7 +384,7 @@ export async function getIndianCinema(req: Request, res: Response) {
     const sortBy = (req.query.sortBy as string) || 'popularity.desc';
     const language = (req.query.language as string) || 'hi|ta|te|ml|kn';
     const year = (req.query.year as string) || '';
-    
+
     const params: Record<string, string> = {
       page,
       sort_by: sortBy,
@@ -513,7 +513,7 @@ export async function searchTMDBProxy(req: Request, res: Response) {
 export async function getStarsAggregated(req: Request, res: Response) {
   try {
     const indianQueries = ['Shah Rukh Khan', 'Prabhas', 'Deepika Padukone', 'Vijay', 'Ranbir Kapoor', 'Allu Arjun', 'Alia Bhatt', 'Ram Charan', 'Jr NTR', 'Salman Khan'];
-    
+
     const [popularRes, trendingRes, ...indianSearches] = await Promise.all([
       fetchTMDB('/person/popular', { page: '1' }).catch(() => ({ results: [] })),
       fetchTMDB('/trending/person/week', { page: '1' }).catch(() => ({ results: [] })),

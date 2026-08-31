@@ -8,6 +8,50 @@ interface MovieDetailsViewProps {
   onOpenIntelligence: (movieTitle?: string) => void;
 }
 
+// Shimmer Skeleton Loader for Movie Details Page
+const SkeletonMovieDetails: React.FC = () => (
+  <div className="space-y-12 animate-pulse pb-16">
+    <div className="h-6 w-24 bg-[#2a2a2a] rounded" />
+    <div className="bg-[#1c1b1b] border border-[#4d4635]/20 rounded-3xl p-6 sm:p-10 flex flex-col md:flex-row gap-8">
+      <div className="w-full sm:w-64 h-96 bg-[#2a2a2a] rounded-2xl shrink-0" />
+      <div className="flex-1 space-y-5">
+        <div className="h-6 bg-[#2a2a2a] rounded w-28" />
+        <div className="h-10 bg-[#2a2a2a] rounded w-3/4" />
+        <div className="h-4 bg-[#2a2a2a] rounded w-1/2" />
+        <div className="flex gap-2">
+          <div className="h-6 bg-[#2a2a2a] rounded w-20" />
+          <div className="h-6 bg-[#2a2a2a] rounded w-24" />
+          <div className="h-6 bg-[#2a2a2a] rounded w-28" />
+        </div>
+        <div className="h-20 bg-[#201f1f] rounded-2xl border border-[#4d4635]/20" />
+        <div className="space-y-2">
+          <div className="h-4 bg-[#2a2a2a] rounded w-full" />
+          <div className="h-4 bg-[#2a2a2a] rounded w-5/6" />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="h-14 bg-[#201f1f] rounded-xl" />
+          <div className="h-14 bg-[#201f1f] rounded-xl" />
+        </div>
+        <div className="h-12 bg-[#2a2a2a] rounded-xl w-56 mt-4" />
+      </div>
+    </div>
+    <div className="space-y-6 pt-6 border-t border-[#4d4635]/20">
+      <div className="h-8 bg-[#2a2a2a] rounded w-48" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+        {[1, 2, 3, 4].map((n) => (
+          <div key={n} className="bg-[#1c1b1b] border border-[#4d4635]/20 rounded-2xl overflow-hidden h-72">
+            <div className="bg-[#2a2a2a] h-48 w-full" />
+            <div className="p-4 space-y-2">
+              <div className="h-4 bg-[#2a2a2a] rounded w-3/4" />
+              <div className="h-3 bg-[#2a2a2a] rounded w-1/2" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
 export const MovieDetailsView: React.FC<MovieDetailsViewProps> = ({
   movieId,
   onOpenIntelligence,
@@ -46,12 +90,7 @@ export const MovieDetailsView: React.FC<MovieDetailsViewProps> = ({
   }, [movieId]);
 
   if (loading) {
-    return (
-      <div className="py-24 flex flex-col items-center justify-center gap-4 text-center animate-pulse">
-        <div className="w-12 h-12 border-4 border-[#f2ca50] border-t-transparent rounded-full animate-spin" />
-        <p className="font-mono text-sm text-[#d0c5af]">Fetching live TMDB movie records...</p>
-      </div>
-    );
+    return <SkeletonMovieDetails />;
   }
 
   if (!movie) {

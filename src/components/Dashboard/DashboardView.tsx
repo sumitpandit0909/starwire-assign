@@ -262,7 +262,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </span>
             </div>
 
-            <div className="flex flex-wrap gap-2.5 ml-auto">
+            <div className="flex flex-wrap gap-2.5">
               <button
                 id="hero-ai-intelligence-btn"
                 onClick={() => onOpenIntelligence()}

@@ -16,6 +16,7 @@ export function useAuth() {
   const logout = useAuthStore((state) => state.logout);
   const toggleFollowStarStore = useAuthStore((state) => state.toggleFollowStar);
   const toggleBookmarkNewsStore = useAuthStore((state) => state.toggleBookmarkNews);
+  const updateUserProfile = useAuthStore((state) => state.updateUserProfile);
 
   const stars = useDataStore((state) => state.stars);
   const news = useDataStore((state) => state.news);
@@ -55,5 +56,6 @@ export function useAuth() {
     logout,
     toggleFollowStar,
     toggleBookmarkNews,
+    updateUserProfile,
   };
 }

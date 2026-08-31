@@ -31,6 +31,7 @@ interface AuthState {
   logout: () => void;
   toggleFollowStar: (starId: string, starName?: string) => Promise<boolean>;
   toggleBookmarkNews: (newsId: string) => Promise<boolean>;
+  updateUserProfile: (updates: Partial<UserStats>) => void;
 }
 
 const DEFAULT_USER: UserStats = {
@@ -41,6 +42,9 @@ const DEFAULT_USER: UserStats = {
   watchlistCount: 0,
   updatesCount: 28,
   avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+  age: undefined,
+  email: 'sumit.pandit@starwire.ai',
+  phone: '+91 98765 43210',
 };
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -197,5 +201,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       await apiToggleBookmarkNews(newsId);
     }
     return !isBookmarked;
+  },
+
+  updateUserProfile: (updates: Partial<UserStats>) => {
+    set((state) => ({
+      user: {
+        ...state.user,
+        ...updates,
+      },
+    }));
   },
 }));

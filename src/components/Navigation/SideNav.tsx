@@ -56,26 +56,21 @@ export const SideNav: React.FC<SideNavProps> = ({
           isOpenMobile ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
-        {/* User Brand Anchor */}
+        {/* Company Brand Header Anchor */}
         <div
-          id="sidebar-user-anchor"
+          id="sidebar-company-brand"
           onClick={() => handleNavClick('/dashboard')}
-          className="mb-10 flex items-center gap-4 cursor-pointer group"
+          className="mb-10 flex items-center gap-3.5 cursor-pointer group px-1"
         >
-          <div className="w-11 h-11 rounded-full overflow-hidden border border-[#99907c]/50 relative ring-1 ring-[#f2ca50]/30 group-hover:ring-[#f2ca50] transition-all">
-            <img
-              src={user.avatarUrl}
-              alt={user.userName}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-              referrerPolicy="no-referrer"
-            />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#f2ca50] to-[#d4af37] flex items-center justify-center text-[#131313] shadow-lg shadow-[#f2ca50]/20 group-hover:scale-105 transition-transform">
+            <span className="material-symbols-outlined text-[24px] font-bold">auto_awesome</span>
           </div>
           <div>
-            <h1 className="font-wordmark text-[14px] uppercase tracking-[0.4em] text-[#f2ca50] group-hover:text-[#ffe088] transition-colors">
+            <h1 className="font-wordmark text-base uppercase tracking-[0.35em] text-[#f2ca50] group-hover:text-[#ffe088] transition-colors font-bold">
               STARWIRE
             </h1>
-            <p className="font-data-label text-[11px] text-[#d0c5af] mt-0.5 tracking-wider truncate max-w-[120px]">
-              {user.userName}
+            <p className="font-mono text-[9px] text-[#10B981] tracking-widest uppercase font-bold">
+              INTELLIGENCE
             </p>
           </div>
         </div>

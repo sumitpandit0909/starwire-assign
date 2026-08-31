@@ -87,30 +87,36 @@ export const TopNav: React.FC<TopNavProps> = ({
           </button>
 
           {/* Logged in User Profile Info & Sign Out Button */}
-          <div className="flex items-center gap-3 pl-2 border-l border-[#4d4635]/30">
+          <div
+            onClick={() => navigate('/profile')}
+            className="flex items-center gap-3 pl-2 border-l border-[#4d4635]/30 cursor-pointer group hover:opacity-90 transition-opacity"
+            title="View Profile Settings"
+          >
             <img
               src={user.avatarUrl}
               alt={user.userName}
-              className="w-8 h-8 rounded-full object-cover border border-[#f2ca50]/40"
+              className="w-8 h-8 rounded-full object-cover border border-[#f2ca50]/40 group-hover:border-[#f2ca50] transition-colors shadow-sm"
               referrerPolicy="no-referrer"
             />
             <div className="text-left hidden lg:block">
-              <p className="text-xs font-semibold text-[#FAF9F6] truncate max-w-[110px]">{user.userName}</p>
-              <p className="text-[10px] text-[#f2ca50] font-mono">Member</p>
+              <p className="text-xs font-semibold text-[#FAF9F6] group-hover:text-[#f2ca50] transition-colors truncate max-w-[110px]">
+                {user.userName}
+              </p>
+              <p className="text-[10px] text-[#f2ca50] font-mono">Profile ↗</p>
             </div>
-
-            {onLogout && (
-              <button
-                id="top-logout-btn"
-                onClick={onLogout}
-                className="text-[#EF4444] hover:text-[#ff6b6b] p-1.5 rounded-lg hover:bg-[#EF4444]/10 transition-colors ml-1 cursor-pointer"
-                title="Sign Out"
-                aria-label="Sign Out"
-              >
-                <span className="material-symbols-outlined text-[20px]">logout</span>
-              </button>
-            )}
           </div>
+
+          {onLogout && (
+            <button
+              id="top-logout-btn"
+              onClick={onLogout}
+              className="text-[#EF4444] hover:text-[#ff6b6b] p-1.5 rounded-lg hover:bg-[#EF4444]/10 transition-colors ml-1 cursor-pointer"
+              title="Sign Out"
+              aria-label="Sign Out"
+            >
+              <span className="material-symbols-outlined text-[20px]">logout</span>
+            </button>
+          )}
         </div>
       </div>
     </header>

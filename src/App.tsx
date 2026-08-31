@@ -23,6 +23,7 @@ import { StarDetailsView } from './components/StarDetails/StarDetailsView';
 import { RequestAccessView } from './components/Auth/RequestAccessView';
 import { WatchlistView } from './components/Watchlist/WatchlistView';
 import { FollowingView } from './components/Following/FollowingView';
+import { ProfileView } from './components/Profile/ProfileView';
 import { TrendingView } from './components/Trending/TrendingView';
 import { MoviesView } from './components/Movies/MoviesView';
 import { MovieDetailsView } from './components/MovieDetails/MovieDetailsView';
@@ -116,6 +117,7 @@ const MainLayout: React.FC<{
   watchlistNewsIds: string[];
   toggleFollowStar: (id: string) => void;
   toggleBookmarkNews: (id: string) => void;
+  updateUserProfile: (updates: any) => void;
   handleLogout: () => void;
   selectStar: (id: string) => void;
   openNewsModal: (id: string) => void;
@@ -127,6 +129,7 @@ const MainLayout: React.FC<{
   watchlistNewsIds,
   toggleFollowStar,
   toggleBookmarkNews,
+  updateUserProfile,
   handleLogout,
   selectStar,
   openNewsModal,
@@ -139,6 +142,7 @@ const MainLayout: React.FC<{
   const isDarkMode = useDataStore((state) => state.isDarkMode);
   const toggleDarkMode = useDataStore((state) => state.toggleDarkMode);
   const toastMessage = useDataStore((state) => state.toastMessage);
+  const showToast = useDataStore((state) => state.showToast);
   const isIntelligenceOpen = useDataStore((state) => state.isIntelligenceOpen);
   const intelligenceTargetStar = useDataStore((state) => state.intelligenceTargetStar);
   const openIntelligenceModal = useDataStore((state) => state.openIntelligenceModal);
@@ -340,6 +344,21 @@ const MainLayout: React.FC<{
               }
             />
 
+            <Route
+              path="/profile"
+              element={
+                <ProfileView
+                  user={user}
+                  followingCount={followingIds.length}
+                  watchlistCount={watchlistNewsIds.length}
+                  onUpdateUser={updateUserProfile}
+                  onShowToast={showToast}
+                  onNavigateFollowing={() => navigate('/following')}
+                  onNavigateWatchlist={() => navigate('/watchlist')}
+                />
+              }
+            />
+
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </main>
@@ -386,6 +405,7 @@ export function AppContent() {
     logout,
     toggleFollowStar,
     toggleBookmarkNews,
+    updateUserProfile,
   } = useAuth();
 
   const { stars, selectStar } = useStars();
@@ -487,6 +507,7 @@ export function AppContent() {
               watchlistNewsIds={watchlistNewsIds}
               toggleFollowStar={toggleFollowStar}
               toggleBookmarkNews={toggleBookmarkNews}
+              updateUserProfile={updateUserProfile}
               handleLogout={handleLogout}
               selectStar={selectStar}
               openNewsModal={openNewsModal}

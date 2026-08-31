@@ -137,6 +137,9 @@ export interface UserStats {
   userRole: string;
   membershipLevel: string;
   avatarUrl: string;
+  age?: number | string;
+  email?: string;
+  phone?: string;
 }
 
 export interface RegionalPerformance {

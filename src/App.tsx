@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   BrowserRouter,
   Routes,
@@ -169,6 +169,8 @@ const MainLayout: React.FC<{
   const followingStarsList = stars.filter((s) => followingIds.includes(s.id));
   const watchlistNewsList = news.filter((n) => watchlistNewsIds.includes(n.id));
 
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
+
   return (
     <div
       id="starwire-app-root"
@@ -194,10 +196,12 @@ const MainLayout: React.FC<{
         isOpenMobile={isMobileNavOpen}
         onCloseMobile={() => setMobileNavOpen(false)}
         onLogout={handleLogout}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
 
       {/* Content Area with Top Header */}
-      <div className="md:pl-64 flex flex-col flex-1 min-h-screen">
+      <div className={`${isSidebarCollapsed ? 'md:pl-20' : 'md:pl-64'} flex flex-col flex-1 min-h-screen transition-all duration-300`}>
         <TopNav
           user={user}
           onOpenSearch={() => setSearchModalOpen(true)}

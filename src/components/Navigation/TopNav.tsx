@@ -71,20 +71,7 @@ export const TopNav: React.FC<TopNavProps> = ({
             </span>
           </button>
 
-          {/* Bookmarks / Watchlist Trigger */}
-          <button
-            id="top-bookmarks-btn"
-            onClick={() => navigate('/watchlist')}
-            className="text-[#d0c5af] hover:text-[#f2ca50] transition-colors p-2 rounded-full hover:bg-[#201f1f] relative cursor-pointer"
-            aria-label="Watchlist"
-          >
-            <span className="material-symbols-outlined text-[22px]">bookmark</span>
-            {watchlistIds.length > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 bg-[#f2ca50] text-[#131313] text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                {watchlistIds.length}
-              </span>
-            )}
-          </button>
+
 
           {/* Logged in User Profile Info & Sign Out Button */}
           <div

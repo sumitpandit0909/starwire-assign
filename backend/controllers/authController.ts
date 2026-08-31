@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User, IUser } from '../models/userModel';
 import mongoose from 'mongoose';
+import { sendPasswordResetEmail } from '../utils/mailer';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'starwire_super_secret_jwt_key_2026_x99';
 
@@ -209,24 +210,109 @@ export async function forgotPassword(req: Request, res: Response) {
     }
 
     if (!user) {
-      // For security, present standard message
-      return res.json({
-        status: 'ok',
-        message: 'If an account exists with that email, a password reset link has been dispatched.',
-      });
+      return res.status(404).json({ error: 'No account found with this email address. Please check your spelling or create an account.' });
     }
 
-    // Generate reset token
-    const resetToken = jwt.sign({ id: user.Id || user._id, type: 'reset' }, JWT_SECRET, { expiresIn: '1h' });
+    // Generate 6-digit verification code
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 mins expiry
+
+    if (isDbConnected) {
+      user.ResetCode = verificationCode;
+      user.ResetCodeExpires = expiresAt;
+      await user.save();
+    } else {
+      user.ResetCode = verificationCode;
+      user.ResetCodeExpires = expiresAt;
+      inMemoryUsers.set(user.Id || user._id, user);
+    }
+
+    // Dispatch 6-digit verification email via Nodemailer
+    const emailResult = await sendPasswordResetEmail(normalizedEmail, verificationCode);
 
     return res.json({
       status: 'ok',
-      message: 'Password reset link sent successfully.',
-      resetToken,
+      message: `A 6-digit verification code has been dispatched to ${normalizedEmail}.`,
+      verificationCode,
+      emailSent: emailResult.success,
+      previewUrl: emailResult.previewUrl,
     });
   } catch (error: any) {
     console.error('Forgot Password Error:', error);
     return res.status(500).json({ error: error.message || 'Server error during forgot password.' });
+  }
+}
+
+/**
+ * @route   POST /api/auth/reset-password
+ * @desc    Verify 6-digit code and reset password
+ * @fields  Email, Code, NewPassword
+ */
+export async function resetPassword(req: Request, res: Response) {
+  try {
+    const { Email, Code, NewPassword } = req.body;
+
+    if (!Email || !Code || !NewPassword) {
+      return res.status(400).json({ error: 'Please provide Email, Verification Code, and New Password.' });
+    }
+
+    if (NewPassword.length < 6) {
+      return res.status(400).json({ error: 'New password must be at least 6 characters long.' });
+    }
+
+    const normalizedEmail = Email.trim().toLowerCase();
+    const isDbConnected = mongoose.connection.readyState === 1;
+
+    let user: any = null;
+    if (isDbConnected) {
+      user = await User.findOne({ Email: normalizedEmail });
+    } else {
+      user = Array.from(inMemoryUsers.values()).find((u) => u.Email === normalizedEmail);
+    }
+
+    if (!user) {
+      return res.status(404).json({ error: 'User account not found.' });
+    }
+
+    // Validate code
+    if (!user.ResetCode || user.ResetCode !== Code.trim()) {
+      return res.status(400).json({ error: 'Invalid verification code. Please check and try again.' });
+    }
+
+    if (user.ResetCodeExpires && new Date() > new Date(user.ResetCodeExpires)) {
+      return res.status(400).json({ error: 'Verification code has expired. Please request a new code.' });
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    const newPasswordHash = await bcrypt.hash(NewPassword, salt);
+
+    if (isDbConnected) {
+      user.PasswordHash = newPasswordHash;
+      user.ResetCode = undefined;
+      user.ResetCodeExpires = undefined;
+      await user.save();
+    } else {
+      user.PasswordHash = newPasswordHash;
+      delete user.ResetCode;
+      delete user.ResetCodeExpires;
+      inMemoryUsers.set(user.Id || user._id, user);
+    }
+
+    const userObj = user.toJSON ? user.toJSON() : { ...user };
+    delete userObj.PasswordHash;
+
+    const token = generateToken(userObj.Id || userObj._id, userObj.Email, userObj.Name, false);
+
+    return res.json({
+      status: 'ok',
+      message: 'Password updated successfully! Welcome to Starwire.',
+      token,
+      user: userObj,
+    });
+  } catch (error: any) {
+    console.error('Reset Password Error:', error);
+    return res.status(500).json({ error: error.message || 'Server error during password reset.' });
   }
 }
 

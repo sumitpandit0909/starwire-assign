@@ -9,6 +9,8 @@ export interface IUser extends Document {
   ProfileImage: string;
   CreatedDate: Date;
   IsActive: boolean;
+  ResetCode?: string;
+  ResetCodeExpires?: Date;
   followedStars: string[];
   bookmarkedNews: string[];
   matchPassword(enteredPassword: string): Promise<boolean>;
@@ -48,6 +50,12 @@ const UserSchema: Schema = new Schema(
     IsActive: {
       type: Boolean,
       default: true,
+    },
+    ResetCode: {
+      type: String,
+    },
+    ResetCodeExpires: {
+      type: Date,
     },
     followedStars: {
       type: [String],

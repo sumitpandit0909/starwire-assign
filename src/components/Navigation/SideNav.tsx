@@ -1,28 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { UserStats } from '../../types';
 
 interface SideNavProps {
   user: UserStats;
   onOpenIntelligence: () => void;
-  isDarkMode: boolean;
-  onToggleTheme: () => void;
+  isDarkMode?: boolean;
+  onToggleTheme?: () => void;
   isOpenMobile?: boolean;
   onCloseMobile?: () => void;
   onLogout?: () => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
 export const SideNav: React.FC<SideNavProps> = ({
-  user,
-  onOpenIntelligence,
-  isDarkMode,
-  onToggleTheme,
   isOpenMobile = false,
   onCloseMobile,
-  onLogout,
+  isCollapsed: externalIsCollapsed,
+  onToggleCollapse,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [internalIsCollapsed, setInternalIsCollapsed] = useState<boolean>(false);
+
+  const isCollapsed = externalIsCollapsed !== undefined ? externalIsCollapsed : internalIsCollapsed;
+  const toggleCollapse = onToggleCollapse || (() => setInternalIsCollapsed(!internalIsCollapsed));
 
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
@@ -52,92 +55,105 @@ export const SideNav: React.FC<SideNavProps> = ({
 
       <nav
         id="main-sidebar"
-        className={`fixed left-0 top-0 h-full w-64 border-r border-[#4d4635]/20 bg-[#131313] dark:bg-[#131313] flex flex-col py-8 px-6 z-50 transition-transform duration-300 ${
-          isOpenMobile ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-        }`}
+        className={`fixed left-0 top-0 h-full border-r border-[#4d4635]/20 bg-[#131313] flex flex-col py-6 z-50 transition-all duration-300 ${
+          isCollapsed ? 'w-20 px-3' : 'w-64 px-5'
+        } ${isOpenMobile ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
-        {/* Company Brand Header Anchor */}
-        <div
-          id="sidebar-company-brand"
-          onClick={() => handleNavClick('/dashboard')}
-          className="mb-10 flex items-center gap-3.5 cursor-pointer group px-1"
-        >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#f2ca50] to-[#d4af37] flex items-center justify-center text-[#131313] shadow-lg shadow-[#f2ca50]/20 group-hover:scale-105 transition-transform">
-            <span className="material-symbols-outlined text-[24px] font-bold">auto_awesome</span>
+        {/* Company Brand Header Anchor & Collapse Toggle */}
+        <div className="mb-8 flex items-center justify-between">
+          <div
+            id="sidebar-company-brand"
+            onClick={() => handleNavClick('/dashboard')}
+            className={`flex items-center gap-3 cursor-pointer group ${isCollapsed ? 'justify-center w-full' : ''}`}
+            title="Starwire Intelligence"
+          >
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#f2ca50] to-[#d4af37] flex items-center justify-center text-[#131313] shadow-lg shadow-[#f2ca50]/20 group-hover:scale-105 transition-transform shrink-0">
+              <span className="material-symbols-outlined text-[24px] font-bold">auto_awesome</span>
+            </div>
+            {!isCollapsed && (
+              <div className="overflow-hidden transition-all duration-300">
+                <h1 className="font-wordmark text-base uppercase tracking-[0.35em] text-[#f2ca50] group-hover:text-[#ffe088] transition-colors font-bold whitespace-nowrap">
+                  STARWIRE
+                </h1>
+                <p className="font-mono text-[9px] text-[#10B981] tracking-widest uppercase font-bold whitespace-nowrap">
+                  INTELLIGENCE
+                </p>
+              </div>
+            )}
           </div>
-          <div>
-            <h1 className="font-wordmark text-base uppercase tracking-[0.35em] text-[#f2ca50] group-hover:text-[#ffe088] transition-colors font-bold">
-              STARWIRE
-            </h1>
-            <p className="font-mono text-[9px] text-[#10B981] tracking-widest uppercase font-bold">
-              INTELLIGENCE
-            </p>
-          </div>
+
+          {/* Desktop Collapse Toggle Button */}
+          {!isCollapsed && (
+            <button
+              onClick={toggleCollapse}
+              className="hidden md:flex p-1.5 rounded-lg text-[#d0c5af] hover:text-[#f2ca50] hover:bg-[#1c1b1b] transition-colors cursor-pointer"
+              title="Collapse Sidebar"
+              aria-label="Collapse Sidebar"
+            >
+              <span className="material-symbols-outlined text-[20px]">chevron_left</span>
+            </button>
+          )}
         </div>
 
+        {/* Collapsed Mode Expand Button */}
+        {isCollapsed && (
+          <button
+            onClick={toggleCollapse}
+            className="hidden md:flex mx-auto mb-6 p-2 rounded-xl bg-[#1c1b1b] border border-[#4d4635]/30 text-[#d0c5af] hover:text-[#f2ca50] hover:border-[#f2ca50] transition-all cursor-pointer shadow-md justify-center items-center"
+            title="Expand Sidebar"
+            aria-label="Expand Sidebar"
+          >
+            <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+          </button>
+        )}
+
         {/* Navigation Items */}
-        <div className="flex-1 flex flex-col gap-1.5 overflow-y-auto hide-scrollbar">
+        <div className="flex-1 flex flex-col gap-2 overflow-y-auto hide-scrollbar">
           {navItems.map((item) => {
-            const isActive = location.pathname === item.path || (item.path === '/explore' && location.pathname.startsWith('/star/'));
+            const isActive =
+              location.pathname === item.path ||
+              (item.path === '/explore' && location.pathname.startsWith('/star/'));
             return (
               <button
                 key={item.path}
                 id={`nav-link-${item.path.replace('/', '')}`}
                 onClick={() => handleNavClick(item.path)}
-                className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-lg font-data-label text-[13px] uppercase tracking-wider transition-all duration-200 text-left cursor-pointer ${
+                title={isCollapsed ? item.label : undefined}
+                className={`w-full flex items-center rounded-xl transition-all duration-200 cursor-pointer ${
+                  isCollapsed
+                    ? 'justify-center p-3'
+                    : 'gap-3.5 px-4 py-3 text-left font-data-label text-[13px] uppercase tracking-wider'
+                } ${
                   isActive
-                    ? 'text-[#f2ca50] font-bold border-r-2 border-[#f2ca50] bg-[#1c1b1b]'
+                    ? 'text-[#f2ca50] font-bold bg-[#1c1b1b] border-r-2 border-[#f2ca50]'
                     : 'text-[#d0c5af] font-medium hover:text-[#f2ca50] hover:bg-[#1c1b1b]/60'
                 }`}
               >
                 <span
-                  className="material-symbols-outlined text-[20px]"
+                  className="material-symbols-outlined text-[22px] shrink-0"
                   style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}
                 >
                   {item.icon}
                 </span>
-                <span>{item.label}</span>
+                {!isCollapsed && <span className="truncate">{item.label}</span>}
               </button>
             );
           })}
         </div>
 
-        {/* View Intelligence Gold CTA Button */}
-        <div className="pt-4">
+        {/* AI Intelligence Gold CTA Button */}
+        <div className="pt-4 mt-auto">
           <button
             id="sidebar-view-intelligence-btn"
             onClick={() => handleNavClick('/intelligence')}
-            className="w-full py-3 px-4 rounded-lg bg-[#d4af37] text-[#1A1A1A] font-data-value text-[13px] font-bold uppercase tracking-widest hover:bg-[#ffe088] transition-all duration-300 btn-glow flex items-center justify-center gap-2 active:scale-98 shadow-md cursor-pointer"
+            title={isCollapsed ? 'AI Intelligence' : undefined}
+            className={`w-full rounded-xl bg-[#d4af37] text-[#1A1A1A] font-data-value font-bold uppercase tracking-widest hover:bg-[#ffe088] transition-all duration-300 btn-glow flex items-center justify-center cursor-pointer shadow-md ${
+              isCollapsed ? 'p-3' : 'py-3 px-4 text-[13px] gap-2 active:scale-98'
+            }`}
           >
-            <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
-            AI Intelligence
+            <span className="material-symbols-outlined text-[20px] shrink-0">auto_awesome</span>
+            {!isCollapsed && <span>AI Intelligence</span>}
           </button>
-        </div>
-
-        {/* Footer Actions / Theme / Sign Out */}
-        <div className="mt-6 border-t border-[#4d4635]/20 pt-4 flex flex-col gap-1">
-          <button
-            id="nav-theme-toggle-btn"
-            onClick={onToggleTheme}
-            className="flex items-center justify-between w-full px-4 py-2 rounded-lg text-[#d0c5af] font-data-label text-[12px] uppercase hover:text-[#f2ca50] hover:bg-[#1c1b1b] transition-colors cursor-pointer"
-          >
-            <div className="flex items-center gap-3">
-              <span className="material-symbols-outlined text-[18px]">contrast</span>
-              <span>Theme</span>
-            </div>
-            <span className="text-[10px] text-[#99907c]">{isDarkMode ? 'Dark' : 'Light'}</span>
-          </button>
-
-          {onLogout && (
-            <button
-              id="nav-logout-btn"
-              onClick={onLogout}
-              className="flex items-center gap-3 w-full px-4 py-2 rounded-lg text-[#EF4444] font-data-label text-[12px] uppercase hover:bg-[#EF4444]/10 transition-colors cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-[18px]">logout</span>
-              <span>Sign Out</span>
-            </button>
-          )}
         </div>
       </nav>
     </>

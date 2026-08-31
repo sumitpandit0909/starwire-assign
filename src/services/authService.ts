@@ -19,6 +19,7 @@ export interface AuthResponse {
   message?: string;
   error?: string;
   token?: string;
+  verificationCode?: string;
   user?: {
     Id: string;
     Name: string;
@@ -141,6 +142,33 @@ export async function apiForgotPassword(email: string): Promise<AuthResponse> {
     return body;
   } catch (err: any) {
     console.error('Forgot Password API Error:', err);
+    return { status: 'error', error: err.message || 'Network error during password reset.' };
+  }
+}
+
+/**
+ * Reset password with 6-digit verification code
+ */
+export async function apiResetPassword(data: { Email: string; Code: string; NewPassword: string }): Promise<AuthResponse> {
+  try {
+    const res = await fetch('/api/auth/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    const body = await res.json();
+    if (!res.ok) {
+      return { status: 'error', error: body.error || 'Failed to reset password.' };
+    }
+
+    if (body.token && body.user) {
+      saveAuthSession(body.token, body.user, false);
+    }
+
+    return body;
+  } catch (err: any) {
+    console.error('Reset Password API Error:', err);
     return { status: 'error', error: err.message || 'Network error during password reset.' };
   }
 }

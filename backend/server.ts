@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDB } from './config/db';
-import { signUp, signIn, forgotPassword, getMe } from './controllers/authController';
+import { signUp, signIn, forgotPassword, resetPassword, getMe } from './controllers/authController';
 import { protect } from './middleware/authMiddleware';
 import {
   getHealth,
@@ -46,6 +46,7 @@ connectDB();
 app.post('/api/auth/signup', signUp);
 app.post('/api/auth/signin', signIn);
 app.post('/api/auth/forgot-password', forgotPassword);
+app.post('/api/auth/reset-password', resetPassword);
 app.get('/api/auth/me', protect, getMe);
 
 // User Activity (Followed Stars & Bookmarks in MongoDB)

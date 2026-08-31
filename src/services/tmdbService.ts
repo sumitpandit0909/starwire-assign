@@ -114,9 +114,11 @@ export async function fetchMarketPulse(): Promise<{ regionalStats: RegionalPerfo
   }
 }
 
-export async function fetchTrendingMovies(timeWindow: 'day' | 'week' = 'week', page = 1): Promise<{ results: TMDBMovie[]; total_results: number }> {
+export async function fetchTrendingMovies(timeWindowOrPage: 'day' | 'week' | number = 'day', page = 1): Promise<{ results: TMDBMovie[]; total_results: number }> {
+  const timeWindow = typeof timeWindowOrPage === 'string' ? timeWindowOrPage : 'day';
+  const pageNum = typeof timeWindowOrPage === 'number' ? timeWindowOrPage : page;
   try {
-    const res = await fetch(`/api/tmdb/trending-movies?timeWindow=${timeWindow}&page=${page}`);
+    const res = await fetch(`/api/tmdb/trending-movies?timeWindow=${timeWindow}&page=${pageNum}`);
     if (!res.ok) throw new Error('Failed to fetch trending movies');
     return await res.json();
   } catch (e) {
@@ -158,10 +160,25 @@ export async function fetchUpcoming(page = 1): Promise<{ results: TMDBMovie[]; t
   }
 }
 
-export async function fetchTrendingPeople(page = 1): Promise<{ results: TMDBPerson[]; total_results: number }> {
+export async function fetchTrendingPeople(timeWindowOrPage: 'day' | 'week' | number = 'day', page = 1): Promise<{ results: TMDBPerson[]; total_results: number }> {
+  const timeWindow = typeof timeWindowOrPage === 'string' ? timeWindowOrPage : 'day';
+  const pageNum = typeof timeWindowOrPage === 'number' ? timeWindowOrPage : page;
   try {
-    const res = await fetch(`/api/tmdb/trending-people?page=${page}`);
+    const res = await fetch(`/api/tmdb/trending-people?timeWindow=${timeWindow}&page=${pageNum}`);
     if (!res.ok) throw new Error('Failed to fetch trending people');
+    return await res.json();
+  } catch (e) {
+    console.warn('TMDB fetch error:', e);
+    return { results: [], total_results: 0 };
+  }
+}
+
+export async function fetchTrendingTV(timeWindowOrPage: 'day' | 'week' | number = 'day', page = 1): Promise<{ results: any[]; total_results: number }> {
+  const timeWindow = typeof timeWindowOrPage === 'string' ? timeWindowOrPage : 'day';
+  const pageNum = typeof timeWindowOrPage === 'number' ? timeWindowOrPage : page;
+  try {
+    const res = await fetch(`/api/tmdb/trending-tv?timeWindow=${timeWindow}&page=${pageNum}`);
+    if (!res.ok) throw new Error('Failed to fetch trending TV');
     return await res.json();
   } catch (e) {
     console.warn('TMDB fetch error:', e);

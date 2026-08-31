@@ -9,6 +9,7 @@ import {
   getLiveNews,
   getOpenRouterIntelligence,
   getTrendingMovies,
+  getTrendingTV,
   getIndianCinema,
   getNowPlaying,
   getUpcoming,
@@ -65,7 +66,11 @@ app.get('/api/market-pulse', getMarketPulse);
 
 // TMDB Movie & Person endpoints
 app.get('/api/tmdb/trending-movies', getTrendingMovies);
+app.get('/api/tmdb/trending-tv', getTrendingTV);
 app.get('/api/tmdb/indian-cinema', getIndianCinema);
+app.get('/api/tmdb/now-playing', getNowPlaying);
+app.get('/api/tmdb/upcoming', getUpcoming);
+app.get('/api/tmdb/trending-people', getTrendingPeople);
 app.get('/api/tmdb/now-playing', getNowPlaying);
 app.get('/api/tmdb/upcoming', getUpcoming);
 app.get('/api/tmdb/trending-people', getTrendingPeople);

@@ -338,9 +338,20 @@ Format with clean markdown with bold section headings and clear bullet points. A
 // 4. TMDB Handlers
 export async function getTrendingMovies(req: Request, res: Response) {
   try {
-    const timeWindow = req.query.timeWindow === 'day' ? 'day' : 'week';
+    const timeWindow = req.query.timeWindow === 'week' ? 'week' : 'day';
     const page = (req.query.page as string) || '1';
     const data = await fetchTMDB(`/trending/movie/${timeWindow}`, { page });
+    res.json(data);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+export async function getTrendingTV(req: Request, res: Response) {
+  try {
+    const timeWindow = req.query.timeWindow === 'week' ? 'week' : 'day';
+    const page = (req.query.page as string) || '1';
+    const data = await fetchTMDB(`/trending/tv/${timeWindow}`, { page });
     res.json(data);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -392,8 +403,9 @@ export async function getUpcoming(req: Request, res: Response) {
 
 export async function getTrendingPeople(req: Request, res: Response) {
   try {
+    const timeWindow = req.query.timeWindow === 'week' ? 'week' : 'day';
     const page = (req.query.page as string) || '1';
-    const data = await fetchTMDB('/trending/person/week', { page });
+    const data = await fetchTMDB(`/trending/person/${timeWindow}`, { page });
     res.json(data);
   } catch (error: any) {
     res.status(500).json({ error: error.message });

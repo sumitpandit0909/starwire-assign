@@ -264,7 +264,7 @@ export const ExploreStarsView: React.FC<ExploreStarsViewProps> = ({
                       title={isFollowed ? 'Following Star' : 'Follow Star'}
                     >
                       <span className="material-symbols-outlined text-[18px]">
-                        {isFollowed ? 'bookmark_added' : 'bookmark_add'}
+                        {isFollowed ? 'person_remove' : 'person_add'}
                       </span>
                     </button>
                   </div>

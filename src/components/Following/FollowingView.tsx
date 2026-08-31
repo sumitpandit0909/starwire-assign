@@ -180,7 +180,7 @@ export const FollowingView: React.FC<FollowingViewProps> = ({
                       }}
                       className="text-xs font-mono text-[#d0c5af] hover:text-[#EF4444] transition-colors cursor-pointer flex items-center gap-1"
                     >
-                      <span className="material-symbols-outlined text-[14px]">bookmark_remove</span>
+                      <span className="material-symbols-outlined text-[14px]">person_remove</span>
                       <span>Unfollow</span>
                     </button>
                   </div>
@@ -284,7 +284,7 @@ export const FollowingView: React.FC<FollowingViewProps> = ({
                     }}
                     className="px-3 py-1.5 rounded-xl bg-[#2a2a2a] hover:bg-[#f2ca50] text-[#FAF9F6] hover:text-[#131313] transition-all font-bold text-xs cursor-pointer flex items-center gap-1"
                   >
-                    <span className="material-symbols-outlined text-[14px]">bookmark_add</span>
+                    <span className="material-symbols-outlined text-[14px]">person_add</span>
                     <span>+ Follow</span>
                   </button>
                 </div>

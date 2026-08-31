@@ -225,7 +225,7 @@ export const StarDetailsView: React.FC<StarDetailsViewProps> = ({
                 }`}
               >
                 <span className="material-symbols-outlined text-[18px]">
-                  {isFollowing ? 'bookmark_added' : 'bookmark_add'}
+                  {isFollowing ? 'person_remove' : 'person_add'}
                 </span>
                 <span>{isFollowing ? 'Following Dossier' : 'Follow Star Dossier'}</span>
               </button>

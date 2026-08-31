@@ -227,9 +227,9 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
                                   : 'bg-[#2a2a2a] hover:bg-[#f2ca50] text-[#FAF9F6] hover:text-[#131313] border-[#4d4635]/40'
                               }`}
                             >
-                              <span className="material-symbols-outlined text-[14px]">
-                                {isFollowed ? 'bookmark_added' : 'bookmark_add'}
-                              </span>
+                                <span className="material-symbols-outlined text-[15px]">
+                                  {isFollowed ? 'person_remove' : 'person_add'}
+                                </span>
                               <span>{isFollowed ? 'Following' : 'Follow'}</span>
                             </button>
                           )}
@@ -314,7 +314,7 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
                                 }`}
                               >
                                 <span className="material-symbols-outlined text-[15px]">
-                                  {isFollowed ? 'bookmark_added' : 'bookmark_add'}
+                                  {isFollowed ? 'person_remove' : 'person_add'}
                                 </span>
                                 <span>{isFollowed ? 'Following' : 'Follow'}</span>
                               </button>

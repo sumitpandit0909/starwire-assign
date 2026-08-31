@@ -100,8 +100,10 @@ app.get('/api', (req, res) => {
   });
 });
 
-app.listen(Number(PORT), '0.0.0.0', () => {
-  console.log(`[STARWIRE Backend] Server running on http://127.0.0.1:${PORT}`);
-});
+if (process.env.VERCEL !== '1' && process.env.NODE_ENV !== 'test') {
+  app.listen(Number(PORT), '0.0.0.0', () => {
+    console.log(`[STARWIRE Backend] Server running on http://127.0.0.1:${PORT}`);
+  });
+}
 
 export default app;
